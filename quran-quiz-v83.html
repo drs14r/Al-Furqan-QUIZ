@@ -1,0 +1,1601 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Al Furqan Quiz · v8.3</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Amiri:ital,wght@0,400;0,700;1,400&family=Nunito:wght@400;600;700;800&family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════
+   CSS VARIABLES  (gold par défaut)
+══════════════════════════════════════════════ */
+:root{
+  --bg-base:#2a1508;
+  --bg-card:rgba(42,21,8,0.96);
+  --bg-card2:rgba(90,46,20,0.92);
+  --bg-verse:rgba(20,8,2,0.72);
+  --border:rgba(212,168,75,0.3);
+  --border-strong:rgba(212,168,75,0.55);
+  --text-primary:#f5e6d0;
+  --text-dim:#c8a882;
+  --text-cream:#fdf6ec;
+  --accent:#d4a84b;
+  --accent-light:#f0c870;
+  --accent-dim:#9a7230;
+  --correct-bg:rgba(38,110,65,0.22);
+  --correct-fg:#7aefb4;
+  --correct-bd:rgba(42,122,74,0.45);
+  --wrong-bg:rgba(120,40,40,0.22);
+  --wrong-fg:#ef9a9a;
+  --wrong-bd:rgba(122,42,42,0.45);
+  --option-bg:rgba(90,46,20,0.45);
+  --option-bd:rgba(212,168,75,0.22);
+  --btn-ghost-bd:rgba(245,230,208,0.22);
+  --btn-ghost-fg:#c8a882;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{
+  background-color:var(--bg-base);
+  background-image:
+    radial-gradient(ellipse at 15% 15%,rgba(212,168,75,0.12) 0%,transparent 50%),
+    radial-gradient(ellipse at 85% 85%,rgba(120,60,20,0.35) 0%,transparent 50%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cg fill='none' stroke='%23d4a84b' stroke-opacity='0.055' stroke-width='0.7'%3E%3Cpath d='M80 12 L95 52 L138 52 L104 76 L118 116 L80 92 L42 116 L56 76 L22 52 L65 52 Z'/%3E%3Ccircle cx='80' cy='80' r='56'/%3E%3C/g%3E%3C/svg%3E");
+  background-size:auto,auto,160px 160px;
+  min-height:100vh;
+  font-family:'Nunito',sans-serif;
+  color:var(--text-primary);
+  display:flex;flex-direction:column;align-items:center;
+  padding:20px 16px 70px;
+  transition:background-color .4s;
+}
+/* ── SCREENS ── */
+.screen{display:none;width:100%;max-width:680px;animation:fadeIn .4s ease}
+.screen.active{display:flex;flex-direction:column;align-items:center}
+@keyframes fadeIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+/* ── TITLE FRAME (v8.3 new) ── */
+.title-frame{
+  display:inline-block;
+  border:2px solid var(--accent);
+  border-radius:14px;
+  padding:10px 36px 8px;
+  position:relative;
+  background:rgba(212,168,75,0.05);
+  margin-bottom:4px;
+}
+.title-frame::before{
+  content:'';
+  position:absolute;inset:4px;
+  border:1px solid rgba(212,168,75,0.18);
+  border-radius:11px;
+  pointer-events:none;
+}
+.title-frame-corner{
+  position:absolute;
+  width:10px;height:10px;
+  border-color:var(--accent);
+  border-style:solid;
+  opacity:.7;
+}
+.title-frame-corner.tl{top:-1px;left:-1px;border-width:2px 0 0 2px;border-radius:4px 0 0 0}
+.title-frame-corner.tr{top:-1px;right:-1px;border-width:2px 2px 0 0;border-radius:0 4px 0 0}
+.title-frame-corner.bl{bottom:-1px;left:-1px;border-width:0 0 2px 2px;border-radius:0 0 0 4px}
+.title-frame-corner.br{bottom:-1px;right:-1px;border-width:0 2px 2px 0;border-radius:0 0 4px 0}
+
+.logo{text-align:center;margin-bottom:10px}
+.logo .ar-title{
+  font-family:'Amiri',serif;
+  font-size:clamp(2.2rem,7vw,3.6rem);
+  color:var(--accent);letter-spacing:2px;line-height:1.1;
+}
+.logo .fr-subtitle{
+  font-family:'Fredoka One',cursive;font-size:.95rem;
+  color:var(--accent-light);letter-spacing:4px;text-transform:uppercase;margin-top:5px;opacity:.85;
+}
+.divider{
+  width:200px;height:1px;
+  background:linear-gradient(to right,transparent,var(--accent),transparent);
+  margin:14px auto;position:relative;
+}
+.divider::after{
+  content:'✦';position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%);color:var(--accent);font-size:10px;
+  background:var(--bg-base);padding:0 6px;line-height:1;
+}
+
+/* ── CARD — no shadow in game ── */
+.card{
+  background:linear-gradient(135deg,var(--bg-card) 0%,var(--bg-card2) 100%);
+  border:1px solid var(--border);border-radius:22px;padding:28px 24px;width:100%;
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);position:relative;overflow:hidden;
+}
+.card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(to right,transparent,rgba(212,168,75,0.5),transparent);
+}
+
+/* ── VERSE BOX — no shadow ── */
+.verse-box{
+  background:var(--bg-verse);
+  border:1.5px solid var(--border-strong);border-radius:18px;
+  padding:26px 22px;text-align:center;margin-bottom:20px;position:relative;
+}
+.verse-box::before{content:'❋';position:absolute;color:var(--accent-dim);font-size:13px;opacity:.7;top:10px;right:14px}
+.verse-box::after{content:'❋';position:absolute;color:var(--accent-dim);font-size:13px;opacity:.7;bottom:10px;left:14px}
+.verse-arabic{
+  font-family:'Amiri',serif;font-size:clamp(1.55rem,4.5vw,2.2rem);
+  color:var(--text-cream);direction:rtl;line-height:2.2;word-spacing:5px;
+}
+
+/* ── MASK ── */
+.name-mask{
+  display:inline-flex;align-items:center;justify-content:center;direction:rtl;
+  background:linear-gradient(135deg,rgba(212,168,75,0.12),rgba(212,168,75,0.22));
+  border:1.5px dashed var(--border-strong);border-radius:8px;padding:2px 10px;
+  color:rgba(212,168,75,0.75);font-family:monospace;font-size:0.62em;letter-spacing:4px;
+  vertical-align:middle;cursor:default;user-select:none;white-space:nowrap;line-height:2;
+  animation:maskPulse 3s ease-in-out infinite;
+}
+@keyframes maskPulse{0%,100%{opacity:.8}50%{opacity:1}}
+
+.question-label{
+  font-family:'Fredoka One',cursive;font-size:.98rem;color:var(--text-dim);
+  text-align:center;margin-bottom:18px;letter-spacing:.3px;
+}
+
+/* ── OPTIONS ── */
+.options-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%;margin-bottom:16px}
+.option-btn{
+  background:var(--option-bg);border:1.5px solid var(--option-bd);border-radius:16px;
+  padding:14px 12px;cursor:pointer;transition:all .2s;text-align:center;color:var(--text-primary);
+}
+.option-btn:hover:not(:disabled){border-color:var(--accent);transform:translateY(-3px)}
+.option-btn .opt-ar{font-family:'Amiri',serif;font-size:1.3rem;direction:rtl;display:block;color:var(--accent-light);margin-bottom:2px}
+.option-btn .opt-fr{font-size:.7rem;color:var(--text-dim);letter-spacing:.8px;display:block}
+.option-btn.correct{background:var(--correct-bg);border-color:var(--correct-fg)}
+.option-btn.wrong{background:var(--wrong-bg);border-color:var(--wrong-fg)}
+.option-btn:disabled{cursor:default;transform:none}
+
+/* ── NAV — no emoji ── */
+.game-nav{display:flex;gap:10px;justify-content:flex-start;width:100%;margin-bottom:14px}
+.btn-nav{font-family:'Fredoka One',cursive;font-size:.83rem;padding:8px 18px;border-radius:50px;border:none;cursor:pointer;transition:all .2s}
+.btn-nav-menu{background:rgba(212,168,75,0.15);border:1.5px solid var(--accent);color:var(--accent)}
+.btn-nav-menu:hover{background:rgba(212,168,75,.3)}
+.btn-nav-quit{background:var(--wrong-bg);border:1.5px solid var(--wrong-bd);color:var(--wrong-fg)}
+.btn-nav-quit:hover{background:rgba(122,42,42,0.45)}
+
+/* ── BUTTONS ── */
+.btn{font-family:'Fredoka One',cursive;font-size:1rem;padding:13px 30px;border-radius:50px;border:none;cursor:pointer;transition:all .25s;letter-spacing:.5px}
+.btn-gold{background:linear-gradient(135deg,var(--accent-light) 0%,var(--accent) 50%,var(--accent-dim) 100%);color:#2a1508;font-weight:700}
+.btn-gold:hover{transform:translateY(-3px)}
+.btn-gold:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.btn-ghost{background:transparent;border:1.5px solid var(--btn-ghost-bd);color:var(--btn-ghost-fg);font-family:'Fredoka One',cursive;font-size:.85rem;padding:10px 22px;border-radius:50px;cursor:pointer;transition:all .2s}
+.btn-ghost:hover{border-color:var(--text-primary);color:var(--text-primary)}
+.btn-row{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:14px}
+
+/* ── SCORE BAR — no shadow ── */
+.score-bar{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:10px 18px;
+  background:linear-gradient(135deg,var(--bg-verse),rgba(212,168,75,0.05));
+  border-radius:14px;border:1px solid var(--border);margin-bottom:20px;
+  font-family:'Fredoka One',cursive;font-size:.88rem;color:var(--text-dim);width:100%;
+}
+.score-bar strong{color:var(--accent);font-size:1.12rem}
+.score-anim{display:inline-block}
+.score-anim.bump{animation:scoreBump .45s cubic-bezier(.34,1.56,.64,1)}
+@keyframes scoreBump{0%{transform:scale(1);color:var(--accent)}40%{transform:scale(1.6);color:#fff685}100%{transform:scale(1);color:var(--accent)}}
+.score-plus-anim{position:fixed;font-family:'Fredoka One',cursive;font-size:1.6rem;color:#fff685;pointer-events:none;z-index:9000;animation:floatUp 1s ease forwards}
+@keyframes floatUp{0%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-90px) scale(1.35)}}
+
+/* ── HOME MODE CARDS ── */
+.mode-cards{display:flex;flex-direction:column;gap:14px;width:100%;margin:10px 0 20px}
+.mode-card{
+  background:linear-gradient(135deg,var(--bg-card) 0%,var(--bg-card2) 100%);
+  border:1.5px solid var(--border);border-radius:20px;padding:22px 20px;cursor:pointer;
+  transition:all .3s;display:flex;align-items:center;gap:18px;
+}
+.mode-card:hover{border-color:var(--accent);transform:translateY(-3px)}
+.mode-card.maintenance{opacity:.6;cursor:default}
+.mode-card.maintenance:hover{transform:none;border-color:var(--border)}
+.maintenance-tag{font-family:'Fredoka One',cursive;font-size:.58rem;padding:2px 8px;background:rgba(255,165,0,.15);border:1px solid rgba(255,165,0,.35);color:#ffb347;border-radius:50px;margin-left:8px}
+.mode-icon{font-size:2rem;flex-shrink:0}
+.mode-title{font-family:'Fredoka One',cursive;font-size:1.12rem;color:var(--accent);margin-bottom:4px}
+.mode-desc{font-size:.8rem;color:var(--text-dim);line-height:1.6}
+
+/* ── LANG ── */
+.lang-selector{display:flex;gap:8px;justify-content:center;margin:8px 0;flex-wrap:wrap}
+.lang-btn{font-family:'Fredoka One',cursive;font-size:.8rem;padding:7px 15px;border-radius:50px;border:1.5px solid var(--border);background:var(--bg-verse);color:var(--text-dim);cursor:pointer;transition:all .2s}
+.lang-btn:hover{border-color:var(--accent);color:var(--accent)}
+.lang-btn.active{background:rgba(212,168,75,.18);border-color:var(--accent);color:var(--accent)}
+
+/* ── THEMES ── */
+.theme-selector{display:flex;gap:8px;justify-content:center;margin:6px 0 12px}
+.theme-btn{font-family:'Fredoka One',cursive;font-size:.76rem;padding:6px 14px;border-radius:50px;border:1.5px solid var(--border);background:var(--bg-verse);color:var(--text-dim);cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:5px}
+.theme-btn:hover{border-color:var(--accent);color:var(--accent)}
+.theme-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(212,168,75,.15)}
+.theme-dot{width:10px;height:10px;border-radius:50%;display:inline-block;border:1px solid rgba(255,255,255,.25)}
+
+/* ── SERIES / MODE SELECTOR ── */
+.series-selector{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:12px 0 8px}
+.series-btn{font-family:'Fredoka One',cursive;font-size:.88rem;padding:8px 18px;border-radius:50px;border:1.5px solid var(--border);background:var(--bg-verse);color:var(--text-dim);cursor:pointer;transition:all .2s}
+.series-btn:hover{border-color:var(--accent);color:var(--accent)}
+.series-btn.active{background:rgba(212,168,75,.22);border-color:var(--accent);color:var(--accent-light)}
+.mode-selector{display:flex;gap:10px;justify-content:center;margin:12px 0}
+.mode-sel-btn{flex:1;max-width:200px;background:var(--option-bg);border:1.5px solid var(--option-bd);border-radius:16px;padding:12px 10px;cursor:pointer;transition:all .22s;text-align:center;color:var(--text-dim)}
+.mode-sel-btn:hover{border-color:var(--accent);color:var(--accent)}
+.mode-sel-btn.active{background:rgba(212,168,75,.2);border-color:var(--accent);color:var(--accent-light)}
+.msb-icon{display:block;font-size:1.4rem;margin-bottom:5px}
+.msb-label{font-family:'Fredoka One',cursive;font-size:.85rem;letter-spacing:.5px}
+.mode-sel-section-title{font-family:'Fredoka One',cursive;font-size:.74rem;color:var(--text-dim);text-align:center;margin-bottom:6px;letter-spacing:1px;text-transform:uppercase}
+
+/* ── FEEDBACK ── */
+.feedback{text-align:center;padding:11px;border-radius:14px;font-family:'Fredoka One',cursive;font-size:.93rem;margin-top:8px;min-height:42px}
+.feedback.correct{background:var(--correct-bg);color:var(--correct-fg);border:1.5px solid var(--correct-bd)}
+.feedback.wrong{background:var(--wrong-bg);color:var(--wrong-fg);border:1.5px solid var(--wrong-bd)}
+
+/* ── DIFF BADGES ── */
+.diff-badge{font-family:'Fredoka One',cursive;font-size:.68rem;letter-spacing:1px;padding:3px 12px;border-radius:50px;margin-bottom:10px;display:inline-block}
+.diff-hard{background:var(--wrong-bg);color:var(--wrong-fg);border:1px solid var(--wrong-bd)}
+.diff-medium{background:rgba(100,55,20,.38);color:var(--accent-light);border:1px solid var(--border)}
+.diff-easy{background:var(--correct-bg);color:var(--correct-fg);border:1px solid var(--correct-bd)}
+
+/* ── END SCREEN ── */
+.score-ring-wrap{position:relative;display:inline-flex;align-items:center;justify-content:center;margin:8px 0}
+.score-ring-wrap svg{position:absolute;top:0;left:0;transform:rotate(-90deg)}
+.score-ring-bg{fill:none;stroke:rgba(212,168,75,.15);stroke-width:5}
+.score-ring-fill{fill:none;stroke:url(#goldGradient);stroke-width:5;stroke-linecap:round;transition:stroke-dashoffset .7s cubic-bezier(.4,0,.2,1)}
+.score-ring-inner{font-family:'Fredoka One',cursive;font-size:2.2rem;color:var(--accent);line-height:1}
+.stars{font-size:1.6rem;margin:8px 0}
+.by-aic{font-family:'Fredoka One',cursive;font-size:.7rem;color:var(--text-dim);opacity:.5;text-align:center;margin-top:18px;letter-spacing:2px}
+.ornament{text-align:center;color:var(--accent-dim);font-size:1.1rem;letter-spacing:8px;margin:12px 0;opacity:.65}
+.setup-title{font-family:'Fredoka One',cursive;font-size:1.18rem;color:var(--accent);text-align:center;margin-bottom:6px}
+.setup-sub{font-size:.8rem;color:var(--text-dim);text-align:center;margin-bottom:18px}
+
+/* ── CONFETTI & WIN ── */
+#win-overlay{position:fixed;inset:0;z-index:9999;display:none;flex-direction:column;align-items:center;justify-content:center;background:rgba(15,5,0,.9)}
+#win-overlay.show{display:flex}
+.confetti-wrap{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:9998}
+.confetti-piece{position:absolute;animation:confettiFall linear forwards}
+@keyframes confettiFall{0%{transform:translateY(-20px) rotate(0deg);opacity:1}100%{transform:translateY(110vh) rotate(720deg);opacity:0}}
+
+/* ── MAINTENANCE ── */
+#maintenance-overlay{position:fixed;inset:0;z-index:8888;display:none;flex-direction:column;align-items:center;justify-content:center;background:rgba(8,3,0,.93);padding:24px}
+#maintenance-overlay.show{display:flex}
+.maintenance-card{background:linear-gradient(135deg,var(--bg-card),var(--bg-card2));border:2px solid rgba(255,165,0,.45);border-radius:26px;padding:36px 28px;text-align:center;max-width:400px;width:90%;animation:cardIn .4s cubic-bezier(.34,1.56,.64,1)}
+@keyframes cardIn{from{transform:scale(.5);opacity:0}to{transform:scale(1);opacity:1}}
+.maint-icon{font-size:3rem;display:block;margin-bottom:14px}
+.maint-title{font-family:'Fredoka One',cursive;font-size:1.5rem;color:#ffb347;margin-bottom:12px}
+.maint-msg{font-family:'Nunito',sans-serif;font-size:.88rem;color:var(--text-dim);line-height:1.8;margin-bottom:8px}
+.maint-ar{font-family:'Amiri',serif;font-size:1.2rem;color:var(--accent-light);direction:rtl;margin:12px 0 20px}
+.maint-bar{width:80%;height:1px;background:linear-gradient(to right,transparent,rgba(255,165,0,.4),transparent);margin:0 auto 20px}
+
+/* ══════════════════════════════════════════
+   GUESS MODE — NOUVEAU SYSTÈME D'INDICES v8.3
+══════════════════════════════════════════ */
+.gv-surah-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(138px,1fr));gap:6px;max-height:300px;overflow-y:auto;padding:4px;margin:10px 0}
+.gv-surah-grid::-webkit-scrollbar{width:4px}
+.gv-surah-grid::-webkit-scrollbar-thumb{background:var(--accent-dim);border-radius:2px}
+.sg-btn{background:var(--option-bg);border:1.5px solid var(--option-bd);border-radius:12px;padding:8px 10px;cursor:pointer;transition:all .15s;text-align:center;color:var(--text-primary)}
+.sg-btn:hover{border-color:var(--accent);background:rgba(212,168,75,.12)}
+.sg-btn.selected{border-color:var(--accent);background:rgba(212,168,75,.22)}
+.sg-btn.correct-answer{border-color:var(--correct-fg);background:var(--correct-bg);animation:pulseCorrect .6s ease}
+@keyframes pulseCorrect{0%{transform:scale(1)}50%{transform:scale(1.06)}100%{transform:scale(1)}}
+.sg-num{display:block;font-size:.58rem;color:var(--accent-dim);font-family:'Fredoka One',cursive;margin-bottom:2px}
+.sg-ar{display:block;font-family:'Amiri',serif;font-size:1rem;color:var(--accent-light);direction:rtl}
+.sg-fr{display:block;font-size:.58rem;color:var(--text-dim);margin-top:2px}
+
+/* Feedback box (wrong/correct/reveal) */
+.gv-fb{display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border-radius:14px;margin-top:8px}
+.gv-fb-correct{background:var(--correct-bg);border:1.5px solid var(--correct-bd)}
+.gv-fb-wrong{background:var(--wrong-bg);border:1.5px solid var(--wrong-bd)}
+.gv-fb-reveal{background:rgba(212,168,75,.08);border:1.5px solid var(--border)}
+
+/* Nouveau : zone d'indices cumulés */
+.gv-hints-area{margin-top:10px;display:flex;flex-direction:column;gap:6px}
+.gv-hint-row{
+  display:flex;align-items:center;gap:10px;
+  padding:8px 14px;
+  background:var(--bg-verse);
+  border:1px solid var(--border);
+  border-radius:10px;
+  animation:fadeIn .35s ease;
+}
+.gv-hint-label{
+  font-family:'Fredoka One',cursive;font-size:.72rem;letter-spacing:.5px;
+  color:var(--accent-dim);min-width:60px;text-transform:uppercase;
+}
+.gv-hint-value{
+  font-family:'Fredoka One',cursive;font-size:.9rem;color:var(--accent-light);flex:1;
+}
+.gv-hint-direction{
+  font-family:'Fredoka One',cursive;font-size:.88rem;
+  padding:4px 12px;border-radius:20px;
+  border:1px solid var(--border);
+  color:var(--accent-light);
+  background:rgba(212,168,75,.08);
+}
+
+.gv-selected-preview{background:var(--bg-verse);border:1.5px solid var(--border);border-radius:12px;padding:10px 14px;text-align:center;margin-bottom:10px;min-height:44px;display:flex;align-items:center;justify-content:center}
+.gv-attempts{margin-bottom:8px;display:flex;align-items:center;gap:4px}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-thumb{background:var(--accent-dim);border-radius:3px}
+
+/* ── HADITH FOOTER (v8.3) ── */
+.hadith-footer{
+  width:100%;max-width:680px;
+  margin-top:14px;
+  padding:16px 20px;
+  background:var(--bg-verse);
+  border:1px solid var(--border);
+  border-radius:16px;
+  text-align:center;
+}
+.hadith-isnad{
+  font-family:'Cairo',sans-serif;font-size:.7rem;
+  color:var(--text-dim);direction:rtl;margin-bottom:6px;opacity:.7;line-height:1.6;
+}
+.hadith-matn{
+  font-family:'Amiri',serif;font-size:1.25rem;
+  color:var(--accent-light);direction:rtl;line-height:1.9;
+  margin-bottom:6px;
+}
+.hadith-source{
+  font-family:'Fredoka One',cursive;font-size:.68rem;
+  color:var(--accent-dim);letter-spacing:1.5px;opacity:.8;
+}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f0c870"/><stop offset="100%" stop-color="#d4a84b"/>
+    </linearGradient>
+  </defs>
+</svg>
+
+<!-- WIN -->
+<div id="win-overlay"><div class="confetti-wrap" id="confetti-wrap"></div></div>
+
+<!-- MAINTENANCE -->
+<div id="maintenance-overlay">
+  <div class="maintenance-card">
+    <span class="maint-icon">🚧</span>
+    <div class="maint-title">Mode en Maintenance</div>
+    <div class="maint-bar"></div>
+    <p class="maint-msg" id="maint-msg-text">Ce mode est actuellement en maintenance.</p>
+    <p class="maint-ar">إن شاء الله</p>
+    <p class="maint-msg" style="font-size:.74rem;opacity:.6;margin-bottom:18px">جزاكم الله خيراً</p>
+    <button class="btn btn-gold" onclick="closeMaintenanceOverlay()" id="maint-btn-ok">Compris</button>
+  </div>
+</div>
+
+<!-- ════ HOME ════ -->
+<div class="screen active" id="screen-home">
+  <div class="logo">
+    <div class="title-frame">
+      <span class="title-frame-corner tl"></span>
+      <span class="title-frame-corner tr"></span>
+      <span class="title-frame-corner bl"></span>
+      <span class="title-frame-corner br"></span>
+      <div class="ar-title">تحدّي القرآن</div>
+    </div>
+    <div class="fr-subtitle" id="home-subtitle">Al Furqan Quiz · v8.3</div>
+  </div>
+  <div class="lang-selector">
+    <button class="lang-btn active" onclick="setLang('fr',event)">FR</button>
+    <button class="lang-btn" onclick="setLang('ar',event)">AR</button>
+    <button class="lang-btn" onclick="setLang('en',event)">EN</button>
+  </div>
+  <div class="theme-selector">
+    <button class="theme-btn active" data-theme="gold" onclick="applyTheme('gold')">
+      <span class="theme-dot" style="background:linear-gradient(135deg,#f0c870,#d4a84b)"></span> Gold
+    </button>
+    <button class="theme-btn" data-theme="claire" onclick="applyTheme('claire')">
+      <span class="theme-dot" style="background:#e8d5b7;border:1px solid #8b5a2b"></span>
+      <span id="theme-claire-label">Claire</span>
+    </button>
+    <button class="theme-btn" data-theme="sombre" onclick="applyTheme('sombre')">
+      <span class="theme-dot" style="background:#1a1a1a;border:1px solid #e05555"></span>
+      <span id="theme-sombre-label">Sombre</span>
+    </button>
+  </div>
+  <div class="divider"></div>
+  <div class="ornament">❋ ✦ ❋</div>
+  <div class="mode-cards">
+    <div class="mode-card" onclick="goToSetup()">
+      <div class="mode-icon">📖</div>
+      <div>
+        <div class="mode-title" id="mode1-title">Mode Solo — القرآء</div>
+        <div class="mode-desc" id="mode1-desc">Quiz QCM ou Mode Devinette — choisissez votre challenge.</div>
+      </div>
+    </div>
+    <div class="mode-card maintenance" onclick="startDuelSetup()">
+      <div class="mode-icon">⚔</div>
+      <div>
+        <div class="mode-title" id="mode2-title">Mode Multijoueur <span class="maintenance-tag">MAINTENANCE</span></div>
+        <div class="mode-desc" id="mode2-desc">Bientôt disponible إن شاء الله.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hadith complet (v8.3) -->
+  <div class="hadith-footer">
+    <div class="hadith-isnad">عَنْ عُثْمَانَ بْنِ عَفَّانَ رَضِيَ اللَّهُ عَنْهُ، عَنِ النَّبِيِّ صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ قَالَ:</div>
+    <div class="hadith-matn">«خَيْرُكُمْ مَنْ تَعَلَّمَ الْقُرْآنَ وَعَلَّمَهُ»</div>
+    <div class="hadith-source">رواه البخاري (٥٠٢٧)</div>
+  </div>
+
+  <div class="by-aic">by AIC · v8.3</div>
+</div>
+
+<!-- ════ SETUP ════ -->
+<div class="screen" id="screen-setup">
+  <div class="logo">
+    <div class="ar-title" style="font-size:1.7rem">تحدّي القرآن</div>
+    <div class="fr-subtitle" id="setup-logo-sub">Mode Solo</div>
+  </div>
+  <div class="divider"></div>
+  <div class="card">
+    <div class="setup-title" id="setup-title">Taille de la série</div>
+    <div class="setup-sub" id="setup-sub">Combien de versets ?</div>
+    <div class="series-selector" id="series-selector"></div>
+    <div class="mode-sel-section-title" id="mode-sel-label" style="margin-top:16px">Mode de jeu</div>
+    <div class="mode-selector" id="mode-selector"></div>
+    <div class="btn-row">
+      <button class="btn btn-gold" onclick="startFromSetup()" id="start-solo-btn">Commencer</button>
+      <button class="btn-ghost" onclick="goHome()" id="setup-back-btn">Retour</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════ QUIZ QCM ════ -->
+<div class="screen" id="screen-quiz">
+  <div class="game-nav">
+    <button class="btn-nav btn-nav-menu" onclick="goHome()" id="nav-menu-btn">Menu</button>
+    <button class="btn-nav btn-nav-quit" onclick="quitGame()" id="nav-quit-btn">Quitter</button>
+  </div>
+  <div class="score-bar" style="width:100%">
+    <span>Q <strong id="q-num">1</strong><span id="q-total">/10</span></span>
+    <span>* <strong><span class="score-anim" id="q-score">0</span></strong></span>
+  </div>
+  <div class="card" style="width:100%">
+    <div class="verse-box">
+      <div style="margin-bottom:8px"><span class="diff-badge" id="verse-diff-badge">Moyen</span></div>
+      <div class="verse-arabic" id="q-verse" dir="rtl"></div>
+    </div>
+    <p class="question-label" id="q-question-label">De quelle sourate provient ce verset ?</p>
+    <div class="options-grid" id="q-options"></div>
+    <div class="feedback" id="q-feedback"></div>
+    <div class="btn-row" style="margin-top:12px">
+      <button class="btn btn-gold" id="q-next" style="display:none" onclick="loadQuestion()">Suivant</button>
+      <button class="btn-ghost" id="end-btn-txt" onclick="endQuiz()" style="font-size:.78rem;padding:9px 18px">Terminer</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════ MODE DEVINETTE ════ -->
+<div class="screen" id="screen-guess-mode">
+  <div class="game-nav">
+    <button class="btn-nav btn-nav-menu" onclick="goHome()" id="gv-nav-menu">Menu</button>
+    <button class="btn-nav btn-nav-quit" onclick="quitGame()" id="gv-nav-quit">Quitter</button>
+  </div>
+  <div class="score-bar" style="width:100%">
+    <span>Q <strong id="gv-num">1</strong><span id="gv-total">/10</span></span>
+    <span>* <strong><span class="score-anim" id="gv-score">0</span></strong></span>
+  </div>
+  <div class="card" style="width:100%">
+    <div class="verse-box">
+      <div style="margin-bottom:8px"><span class="diff-badge" id="gv-diff-badge">Moyen</span></div>
+      <div class="verse-arabic" id="gv-verse" dir="rtl"></div>
+    </div>
+    <p class="question-label" id="gv-question-label">De quelle sourate provient ce verset ?</p>
+    <div class="gv-attempts" id="gv-attempts-bar"></div>
+    <div class="gv-selected-preview">
+      <span id="gv-selected-name" style="font-family:'Fredoka One',cursive;font-size:.85rem;color:var(--text-dim)">— Choisissez une sourate —</span>
+    </div>
+    <div class="gv-surah-grid" id="gv-surah-grid"></div>
+    <!-- Zone hints cumulés (v8.3) -->
+    <div class="gv-hints-area" id="gv-hints-area"></div>
+    <div id="gv-feedback-area"></div>
+    <div class="btn-row" style="margin-top:12px">
+      <button class="btn btn-gold" id="gv-submit-btn" disabled onclick="submitGuess()">Valider</button>
+      <button class="btn-ghost" id="gv-abandon-btn" onclick="abandonGuess()" style="color:var(--wrong-fg);border-color:var(--wrong-bd)">Abandonner</button>
+      <button class="btn btn-gold" id="gv-next-btn" style="display:none" onclick="">Suivant</button>
+    </div>
+    <div class="btn-row" style="margin-top:4px">
+      <button class="btn-ghost" id="gv-end-btn" onclick="endGuessMode()" style="font-size:.78rem;padding:9px 18px">Terminer</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════ END ════ -->
+<div class="screen" id="screen-end">
+  <div class="logo">
+    <div class="ar-title" style="font-size:1.7rem">النتيجة</div>
+  </div>
+  <div class="divider"></div>
+  <div class="card" style="text-align:center">
+    <div class="setup-title" id="end-subtitle">Résultat Final</div>
+    <div style="margin:20px 0">
+      <div class="score-ring-wrap" style="width:130px;height:130px">
+        <svg width="130" height="130" viewBox="0 0 130 130">
+          <circle class="score-ring-bg" cx="65" cy="65" r="56"/>
+          <circle class="score-ring-fill" id="score-ring-fill" cx="65" cy="65" r="56" stroke-dasharray="351.86" stroke-dashoffset="351.86"/>
+        </svg>
+        <div class="score-ring-inner"><span id="end-score">0</span><span id="end-total" style="font-size:1rem;color:var(--text-dim)"></span></div>
+      </div>
+    </div>
+    <div class="stars" id="end-stars"></div>
+    <div style="font-family:'Fredoka One',cursive;font-size:1rem;color:var(--text-dim);margin-top:8px" id="end-msg"></div>
+    <div class="btn-row" style="margin-top:22px">
+      <button class="btn btn-gold" onclick="replayFromEnd()" id="replay-btn">Rejouer</button>
+      <button class="btn-ghost" onclick="goHome()" id="home-btn-end">Accueil</button>
+    </div>
+  </div>
+</div>
+
+
+<script>
+/* ════ LANGUE & TRADUCTIONS ════ */
+let currentLang='fr';
+const T={
+  fr:{
+    subtitle:'Al Furqan Quiz · v8.3',
+    mode1Title:'Mode Solo — القرآء',mode1Desc:'Quiz QCM ou Mode Devinette — choisissez votre challenge.',
+    mode2Title:'Mode Multijoueur — المبارزة',mode2Desc:'Bientôt disponible إن شاء الله.',
+    setupTitle:'Taille de la série',setupSub:'Combien de versets ?',setupLogoSub:'Mode Solo',
+    startSolo:'Commencer',backBtn:'Retour',
+    navMenu:'Menu',navQuit:'Quitter',
+    questionLabel:'De quelle sourate provient ce verset ?',nextVerse:'Suivant',endGame:'Terminer',
+    endSubtitle:'Résultat Final',replay:'Rejouer',homeBtn:'Accueil',
+    correctFb:'Bonne réponse !',wrongFbPre:'Faux — C\'était : ',
+    seriesInfinite:'Infini',
+    endMsg9:'Exceptionnel ! ماشاء الله',endMsg6:'Très bien ! أحسنت',
+    endMsg3:'Continue à pratiquer ! واصل التعلم',endMsg0:'Il faut réviser ! راجع السور',
+    quitConfirm:'Voulez-vous vraiment quitter ?',
+    diffEasy:'Facile',diffMedium:'Moyen',diffHard:'Difficile',
+    modeQCM:'QCM',modeGuess:'Devinette',modeSelLabel:'Mode de jeu',
+    guessQuestion:'De quelle sourate provient ce verset ?',guessSubmit:'Valider',guessAbandon:'Abandonner',
+    gvSelectPrompt:'— Choisissez une sourate —',guessCorrect:'Bonne réponse !',
+    attempt:'Essai',attempts:'Essais',
+    abandonConfirm:'Abandonner cette question ?',correctAnswerWas:'La bonne réponse était :',
+    surahLabel:'Sourate',themeLabel:'Thème',themeClair:'Claire',themeSombre:'Sombre',
+    maintMsg:'Ce mode est actuellement en maintenance. Il sera disponible dans les prochaines mises à jour.',
+    maintOk:'Compris',
+    /* Indices Devinette v8.3 */
+    hintDirection:'Direction',
+    hintDirectionAfter:'Vient APRES dans le Coran',
+    hintDirectionBefore:'Vient AVANT dans le Coran',
+    hintDistance:'Distance',
+    hintSurahsAway:'sourate(s)',
+    hintJuz:'Juz',
+    hintType:'Type',
+    hintAyahs:'Versets',
+    hintReveal:'Réponse révélée',
+  },
+  en:{
+    subtitle:'Al Furqan Quiz · v8.3',
+    mode1Title:'Solo Mode — القرآء',mode1Desc:'MCQ Quiz or Guess Mode — choose your challenge.',
+    mode2Title:'Multiplayer — المبارزة',mode2Desc:'Coming soon إن شاء الله.',
+    setupTitle:'Series Length',setupSub:'How many verses?',setupLogoSub:'Solo Mode',
+    startSolo:'Start',backBtn:'Back',navMenu:'Menu',navQuit:'Quit',
+    questionLabel:'Which surah does this verse belong to?',nextVerse:'Next',endGame:'End',
+    endSubtitle:'Final Result',replay:'Play Again',homeBtn:'Home',
+    correctFb:'Correct answer!',wrongFbPre:'Wrong — It was: ',
+    seriesInfinite:'Infinite',
+    endMsg9:'Exceptional! ماشاء الله',endMsg6:'Very good! أحسنت',
+    endMsg3:'Keep practicing! واصل التعلم',endMsg0:'Review the surahs! راجع السور',
+    quitConfirm:'Really quit?',
+    diffEasy:'Easy',diffMedium:'Medium',diffHard:'Hard',
+    modeQCM:'MCQ',modeGuess:'Guess',modeSelLabel:'Game mode',
+    guessQuestion:'Which surah is this verse from?',guessSubmit:'Submit',guessAbandon:'Give up',
+    gvSelectPrompt:'— Choose a surah —',guessCorrect:'Correct!',
+    attempt:'Try',attempts:'Tries',
+    abandonConfirm:'Give up this question?',correctAnswerWas:'Correct answer was:',
+    surahLabel:'Surah',themeLabel:'Theme',themeClair:'Light',themeSombre:'Dark',
+    maintMsg:'This mode is under maintenance.',maintOk:'Got it',
+    hintDirection:'Direction',
+    hintDirectionAfter:'Comes AFTER in the Quran',
+    hintDirectionBefore:'Comes BEFORE in the Quran',
+    hintDistance:'Distance',hintSurahsAway:'surah(s)',
+    hintJuz:'Juz',hintType:'Type',hintAyahs:'Verses',hintReveal:'Answer revealed',
+  },
+  ar:{
+    subtitle:'تحدي القرآن v8.3',
+    mode1Title:'المنفرد — القرآء',mode1Desc:'اختبار خيارات أو تخمين — اختر تحديك.',
+    mode2Title:'المبارزة — متعدد',mode2Desc:'قريباً إن شاء الله.',
+    setupTitle:'حجم السلسلة',setupSub:'كم آية تريد اللعب؟',setupLogoSub:'المنفرد',
+    startSolo:'ابدأ',backBtn:'رجوع',navMenu:'القائمة',navQuit:'خروج',
+    questionLabel:'من أي سورة هذه الآية؟',nextVerse:'التالي',endGame:'إنهاء',
+    endSubtitle:'النتيجة النهائية',replay:'إعادة',homeBtn:'الرئيسية',
+    correctFb:'صحيح! ماشاء الله',wrongFbPre:'خطأ — كانت: ',
+    seriesInfinite:'لا نهاية',
+    endMsg9:'ممتاز! ماشاء الله',endMsg6:'جيد جداً! أحسنت',
+    endMsg3:'واصل التعلم!',endMsg0:'راجع السور!',
+    quitConfirm:'هل تريد مغادرة اللعبة؟',
+    diffEasy:'سهل',diffMedium:'متوسط',diffHard:'صعب',
+    modeQCM:'اختيار',modeGuess:'تخمين',modeSelLabel:'وضع اللعبة',
+    guessQuestion:'من أي سورة هذه الآية؟',guessSubmit:'تأكيد',guessAbandon:'استسلام',
+    gvSelectPrompt:'— اختر سورة —',guessCorrect:'صحيح!',
+    attempt:'محاولة',attempts:'محاولات',
+    abandonConfirm:'هل تستسلم؟',correctAnswerWas:'الإجابة الصحيحة:',
+    surahLabel:'سورة',themeLabel:'المظهر',themeClair:'فاتح',themeSombre:'داكن',
+    maintMsg:'هذا الوضع قيد الصيانة.',maintOk:'حسناً',
+    hintDirection:'الاتجاه',
+    hintDirectionAfter:'تأتي بعدها في القرآن',
+    hintDirectionBefore:'تأتي قبلها في القرآن',
+    hintDistance:'المسافة',hintSurahsAway:'سورة',
+    hintJuz:'الجزء',hintType:'النوع',hintAyahs:'الآيات',hintReveal:'الإجابة الصحيحة',
+  }
+};
+function t(k){return T[currentLang]?.[k]??T.fr?.[k]??k;}
+function setLang(lang,e){
+  currentLang=lang;
+  localStorage.setItem('quranLang',lang);
+  document.querySelectorAll('.lang-btn').forEach(b=>b.classList.remove('active'));
+  e?.target?.classList.add('active');
+  applyLang();
+}
+function applyLang(){
+  document.getElementById('home-subtitle').textContent=t('subtitle');
+  document.getElementById('mode1-title').textContent=t('mode1Title');
+  document.getElementById('mode1-desc').textContent=t('mode1Desc');
+  document.getElementById('mode2-title').innerHTML=t('mode2Title')+' <span class="maintenance-tag">MAINTENANCE</span>';
+  document.getElementById('mode2-desc').textContent=t('mode2Desc');
+}
+</script>
+
+<script>
+/* ════ THÈMES ════ */
+const THEMES={
+  gold:{
+    '--bg-base':'#2a1508','--bg-card':'rgba(42,21,8,0.96)','--bg-card2':'rgba(90,46,20,0.92)',
+    '--bg-verse':'rgba(20,8,2,0.72)','--border':'rgba(212,168,75,0.3)',
+    '--border-strong':'rgba(212,168,75,0.55)','--text-primary':'#f5e6d0','--text-dim':'#c8a882',
+    '--text-cream':'#fdf6ec','--accent':'#d4a84b','--accent-light':'#f0c870','--accent-dim':'#9a7230',
+    '--correct-bg':'rgba(38,110,65,0.22)','--correct-fg':'#7aefb4','--correct-bd':'rgba(42,122,74,0.45)',
+    '--wrong-bg':'rgba(120,40,40,0.22)','--wrong-fg':'#ef9a9a','--wrong-bd':'rgba(122,42,42,0.45)',
+    '--option-bg':'rgba(90,46,20,0.45)','--option-bd':'rgba(212,168,75,0.22)',
+    '--btn-ghost-bd':'rgba(245,230,208,0.22)','--btn-ghost-fg':'#c8a882',
+  },
+  claire:{
+    '--bg-base':'#e8d5b7','--bg-card':'rgba(255,248,235,0.97)','--bg-card2':'rgba(240,225,200,0.95)',
+    '--bg-verse':'rgba(255,255,255,0.85)','--border':'rgba(139,90,43,0.25)',
+    '--border-strong':'rgba(139,90,43,0.5)','--text-primary':'#3b1f0e','--text-dim':'#6b3a1f',
+    '--text-cream':'#3b1f0e','--accent':'#8b5a2b','--accent-light':'#c49a6c','--accent-dim':'#6b3a1f',
+    '--correct-bg':'rgba(42,122,74,0.12)','--correct-fg':'#1a5c34','--correct-bd':'rgba(42,122,74,0.35)',
+    '--wrong-bg':'rgba(180,50,50,0.1)','--wrong-fg':'#8b1a1a','--wrong-bd':'rgba(180,50,50,0.3)',
+    '--option-bg':'rgba(255,248,235,0.8)','--option-bd':'rgba(139,90,43,0.2)',
+    '--btn-ghost-bd':'rgba(59,31,14,0.25)','--btn-ghost-fg':'#6b3a1f',
+  },
+  sombre:{
+    '--bg-base':'#0d0d0d','--bg-card':'rgba(20,20,20,0.97)','--bg-card2':'rgba(30,30,30,0.95)',
+    '--bg-verse':'rgba(10,10,10,0.9)','--border':'rgba(180,20,20,0.3)',
+    '--border-strong':'rgba(200,30,30,0.55)','--text-primary':'#e0e0e0','--text-dim':'#999',
+    '--text-cream':'#e8e8e8','--accent':'#cc2222','--accent-light':'#ee4444','--accent-dim':'#991111',
+    '--correct-bg':'rgba(20,80,40,0.25)','--correct-fg':'#5aefaa','--correct-bd':'rgba(30,120,60,0.4)',
+    '--wrong-bg':'rgba(120,20,20,0.25)','--wrong-fg':'#ff7070','--wrong-bd':'rgba(160,30,30,0.45)',
+    '--option-bg':'rgba(30,30,30,0.7)','--option-bd':'rgba(180,20,20,0.25)',
+    '--btn-ghost-bd':'rgba(220,220,220,0.15)','--btn-ghost-fg':'#999',
+  },
+};
+let currentTheme='gold';
+function applyTheme(name){
+  currentTheme=name;
+  localStorage.setItem('quranTheme',name);
+  const root=document.documentElement, vars=THEMES[name];
+  if(!vars) return;
+  Object.entries(vars).forEach(([k,v])=>root.style.setProperty(k,v));
+  if(name==='claire'){document.body.style.backgroundColor='#e8d5b7';document.body.style.backgroundImage='none';}
+  else if(name==='sombre'){document.body.style.backgroundColor='#0d0d0d';document.body.style.backgroundImage='none';}
+  else{document.body.style.backgroundColor='';document.body.style.backgroundImage='';}
+  document.querySelectorAll('.theme-btn').forEach(b=>b.classList.toggle('active',b.dataset.theme===name));
+  // Met à jour le divider bg
+  document.querySelectorAll('.divider').forEach(d=>d.style.setProperty('--bg-base',THEMES[name]['--bg-base']));
+}
+</script>
+
+<script>
+/* ════ SURAHS DATA (114 sourates) ════ */
+const SURAHS=[
+  {num:1,ar:"الفاتحة",fr:"Al-Fatiha",en:"Al-Fatiha",ayahs:7,juz:1,type:"Mecquoise",typeEn:"Meccan",themeAr:"الحمد والدعاء",prophets:[],context:"صلاة يومية"},
+  {num:2,ar:"البقرة",fr:"Al-Baqara",en:"Al-Baqara",ayahs:286,juz:1,type:"Médinoise",typeEn:"Medinan",themeAr:"الشريعة والإيمان",prophets:["موسى","إبراهيم","آدم"],context:"أطول سورة"},
+  {num:3,ar:"آل عمران",fr:"Al-Imran",en:"Al-Imran",ayahs:200,juz:3,type:"Médinoise",typeEn:"Medinan",themeAr:"الإيمان وآل عمران",prophets:["عيسى","مريم","إبراهيم","زكريا"],context:"غزوة أحد"},
+  {num:4,ar:"النساء",fr:"An-Nisa",en:"An-Nisa",ayahs:176,juz:4,type:"Médinoise",typeEn:"Medinan",themeAr:"حقوق المرأة",prophets:["موسى","عيسى","إبراهيم"],context:"أحكام الميراث"},
+  {num:5,ar:"المائدة",fr:"Al-Maida",en:"Al-Maida",ayahs:120,juz:6,type:"Médinoise",typeEn:"Medinan",themeAr:"العهود والمأكولات",prophets:["عيسى","موسى"],context:"آخر سورة نزلت"},
+  {num:6,ar:"الأنعام",fr:"Al-Anam",en:"Al-Anam",ayahs:165,juz:7,type:"Mecquoise",typeEn:"Meccan",themeAr:"التوحيد",prophets:["إبراهيم","نوح","موسى"],context:"حجج التوحيد"},
+  {num:7,ar:"الأعراف",fr:"Al-Araf",en:"Al-Araf",ayahs:206,juz:8,type:"Mecquoise",typeEn:"Meccan",themeAr:"قصص الأنبياء",prophets:["موسى","هود","نوح","صالح","شعيب","لوط","إبراهيم","آدم"],context:"آدم والشيطان"},
+  {num:8,ar:"الأنفال",fr:"Al-Anfal",en:"Al-Anfal",ayahs:75,juz:9,type:"Médinoise",typeEn:"Medinan",themeAr:"الجهاد والغنائم",prophets:[],context:"غزوة بدر"},
+  {num:9,ar:"التوبة",fr:"At-Tawba",en:"At-Tawba",ayahs:129,juz:10,type:"Médinoise",typeEn:"Medinan",themeAr:"البراءة والجهاد",prophets:["إبراهيم"],context:"براءة من المشركين"},
+  {num:10,ar:"يونس",fr:"Yunus",en:"Yunus",ayahs:109,juz:11,type:"Mecquoise",typeEn:"Meccan",themeAr:"التوحيد وقصص الأنبياء",prophets:["يونس","موسى","نوح"],context:"قصة يونس وموسى"},
+  {num:11,ar:"هود",fr:"Hud",en:"Hud",ayahs:123,juz:11,type:"Mecquoise",typeEn:"Meccan",themeAr:"قصص الأمم",prophets:["نوح","هود","صالح","لوط","شعيب","إبراهيم","موسى"],context:"قصص الأنبياء والعقاب"},
+  {num:12,ar:"يوسف",fr:"Yusuf",en:"Yusuf",ayahs:111,juz:12,type:"Mecquoise",typeEn:"Meccan",themeAr:"قصة يوسف",prophets:["يوسف","يعقوب","إبراهيم"],context:"أحسن القصص"},
+  {num:13,ar:"الرعد",fr:"Ar-Rad",en:"Ar-Rad",ayahs:43,juz:13,type:"Médinoise",typeEn:"Medinan",themeAr:"آيات الله",prophets:[],context:"التوحيد وآيات الكون"},
+  {num:14,ar:"إبراهيم",fr:"Ibrahim",en:"Ibrahim",ayahs:52,juz:13,type:"Mecquoise",typeEn:"Meccan",themeAr:"دعاء إبراهيم",prophets:["إبراهيم","موسى"],context:"دعاء إبراهيم لمكة"},
+  {num:15,ar:"الحجر",fr:"Al-Hijr",en:"Al-Hijr",ayahs:99,juz:14,type:"Mecquoise",typeEn:"Meccan",themeAr:"التوحيد وقصة إبراهيم",prophets:["إبراهيم","لوط"],context:"أصحاب الحجر"},
+  {num:16,ar:"النحل",fr:"An-Nahl",en:"An-Nahl",ayahs:128,juz:14,type:"Mecquoise",typeEn:"Meccan",themeAr:"نعم الله",prophets:["إبراهيم","موسى","عيسى"],context:"النعم الإلهية"},
+  {num:17,ar:"الإسراء",fr:"Al-Isra",en:"Al-Isra",ayahs:111,juz:15,type:"Mecquoise",typeEn:"Meccan",themeAr:"الإسراء والمعراج",prophets:["موسى","إبراهيم"],context:"مسرى النبي"},
+  {num:18,ar:"الكهف",fr:"Al-Kahf",en:"Al-Kahf",ayahs:110,juz:15,type:"Mecquoise",typeEn:"Meccan",themeAr:"أهل الكهف",prophets:["موسى","ذو القرنين"],context:"يُقرأ يوم الجمعة"},
+  {num:19,ar:"مريم",fr:"Maryam",en:"Maryam",ayahs:98,juz:16,type:"Mecquoise",typeEn:"Meccan",themeAr:"مريم وعيسى",prophets:["عيسى","يحيى","زكريا","إبراهيم","إسماعيل","إدريس","موسى"],context:"قصة ولادة عيسى"},
+  {num:20,ar:"طه",fr:"Taha",en:"Taha",ayahs:135,juz:16,type:"Mecquoise",typeEn:"Meccan",themeAr:"موسى والفرعون",prophets:["موسى","آدم"],context:"قصة موسى مع فرعون"},
+  {num:21,ar:"الأنبياء",fr:"Al-Anbiya",en:"Al-Anbiya",ayahs:112,juz:17,type:"Mecquoise",typeEn:"Meccan",themeAr:"قصص الأنبياء",prophets:["إبراهيم","لوط","موسى","هارون","نوح","داود","سليمان","أيوب","يونس","زكريا","يحيى","عيسى","إسماعيل","إدريس"],context:"قصص متعددة للأنبياء"},
+  {num:22,ar:"الحج",fr:"Al-Hajj",en:"Al-Hajj",ayahs:78,juz:17,type:"Médinoise",typeEn:"Medinan",themeAr:"الحج والجهاد",prophets:["إبراهيم","موسى"],context:"شعائر الحج"},
+  {num:23,ar:"المؤمنون",fr:"Al-Muminun",en:"Al-Muminun",ayahs:118,juz:18,type:"Mecquoise",typeEn:"Meccan",themeAr:"صفات المؤمنين",prophets:["نوح","موسى","عيسى"],context:"خلق الإنسان"},
+  {num:24,ar:"النور",fr:"An-Nur",en:"An-Nur",ayahs:64,juz:18,type:"Médinoise",typeEn:"Medinan",themeAr:"النور والحشمة",prophets:[],context:"قضية الإفك"},
+  {num:25,ar:"الفرقان",fr:"Al-Furqan",en:"Al-Furqan",ayahs:77,juz:18,type:"Mecquoise",typeEn:"Meccan",themeAr:"الفرقان والتوحيد",prophets:["موسى","نوح","إبراهيم"],context:"الرد على المشركين"},
+  {num:26,ar:"الشعراء",fr:"Ash-Shuara",en:"Ash-Shuara",ayahs:227,juz:19,type:"Mecquoise",typeEn:"Meccan",themeAr:"قصص الأنبياء",prophets:["موسى","إبراهيم","نوح","هود","صالح","لوط","شعيب"],context:"قصص متعددة"},
+  {num:27,ar:"النمل",fr:"An-Naml",en:"An-Naml",ayahs:93,juz:19,type:"Mecquoise",typeEn:"Meccan",themeAr:"قصة سليمان",prophets:["سليمان","موسى","صالح","لوط"],context:"ملكة سبأ وسليمان"},
+  {num:28,ar:"القصص",fr:"Al-Qasas",en:"Al-Qasas",ayahs:88,juz:20,type:"Mecquoise",typeEn:"Meccan",themeAr:"قصة موسى الكاملة",prophets:["موسى"],context:"ولادة موسى حتى النبوة"},
+  {num:29,ar:"العنكبوت",fr:"Al-Ankabut",en:"Al-Ankabut",ayahs:69,juz:20,type:"Mecquoise",typeEn:"Meccan",themeAr:"الابتلاء والإيمان",prophets:["إبراهيم","لوط","نوح","موسى"],context:"الفتنة وثبات المؤمنين"},
+  {num:30,ar:"الروم",fr:"Ar-Rum",en:"Ar-Rum",ayahs:60,juz:21,type:"Mecquoise",typeEn:"Meccan",themeAr:"غلبة الروم",prophets:[],context:"نبوءة انتصار الروم"},
+  {num:31,ar:"لقمان",fr:"Luqman",en:"Luqman",ayahs:34,juz:21,type:"Mecquoise",typeEn:"Meccan",themeAr:"حكمة لقمان",prophets:["لقمان"],context:"نصائح لقمان لابنه"},
+  {num:32,ar:"السجدة",fr:"As-Sajda",en:"As-Sajda",ayahs:30,juz:21,type:"Mecquoise",typeEn:"Meccan",themeAr:"السجود والإيمان",prophets:["موسى"],context:"خلق الإنسان"},
+  {num:33,ar:"الأحزاب",fr:"Al-Ahzab",en:"Al-Ahzab",ayahs:73,juz:21,type:"Médinoise",typeEn:"Medinan",themeAr:"أحزاب وزواج النبي",prophets:["إبراهيم","موسى","عيسى"],context:"غزوة الأحزاب"},
+  {num:34,ar:"سبأ",fr:"Saba",en:"Saba",ayahs:54,juz:22,type:"Mecquoise",typeEn:"Meccan",themeAr:"قصة سبأ",prophets:["سليمان","داود"],context:"نعمة الله على داود وسليمان وسبأ"},
+  {num:35,ar:"فاطر",fr:"Fatir",en:"Fatir",ayahs:45,juz:22,type:"Mecquoise",typeEn:"Meccan",themeAr:"الخالق الواحد",prophets:[],context:"توحيد الله الخالق"},
+  {num:36,ar:"يس",fr:"Ya-Sin",en:"Ya-Sin",ayahs:83,juz:22,type:"Mecquoise",typeEn:"Meccan",themeAr:"قلب القرآن",prophets:[],context:"قلب القرآن"},
+  {num:37,ar:"الصافات",fr:"As-Saffat",en:"As-Saffat",ayahs:182,juz:23,type:"Mecquoise",typeEn:"Meccan",themeAr:"الملائكة والأنبياء",prophets:["إبراهيم","إسماعيل","موسى","إلياس","يونس","لوط"],context:"قصص الأنبياء والجزاء"},
+  {num:38,ar:"ص",fr:"Sad",en:"Sad",ayahs:88,juz:23,type:"Mecquoise",typeEn:"Meccan",themeAr:"داود وسليمان وأيوب",prophets:["داود","سليمان","أيوب","إبراهيم","إسحاق","يعقوب","إسماعيل"],context:"قصة داود وسليمان وأيوب"},
+  {num:39,ar:"الزمر",fr:"Az-Zumar",en:"Az-Zumar",ayahs:75,juz:23,type:"Mecquoise",typeEn:"Meccan",themeAr:"الإخلاص والجزاء",prophets:["إبراهيم"],context:"زمر أهل الجنة والنار"},
+  {num:40,ar:"غافر",fr:"Ghafir",en:"Ghafir",ayahs:85,juz:24,type:"Mecquoise",typeEn:"Meccan",themeAr:"غافر الذنب",prophets:["موسى","نوح","إبراهيم","يوسف"],context:"مؤمن آل فرعون"},
+  {num:41,ar:"فصلت",fr:"Fussilat",en:"Fussilat",ayahs:54,juz:24,type:"Mecquoise",typeEn:"Meccan",themeAr:"الآيات المفصلة",prophets:["موسى"],context:"التفصيل في القرآن"},
+  {num:42,ar:"الشورى",fr:"Ash-Shura",en:"Ash-Shura",ayahs:53,juz:25,type:"Mecquoise",typeEn:"Meccan",themeAr:"الشورى والوحي",prophets:["نوح","إبراهيم","موسى","عيسى"],context:"الوحي والشورى"},
+  {num:43,ar:"الزخرف",fr:"Az-Zukhruf",en:"Az-Zukhruf",ayahs:89,juz:25,type:"Mecquoise",typeEn:"Meccan",themeAr:"زخرف الدنيا والآخرة",prophets:["موسى","إبراهيم","عيسى"],context:"التوحيد ورد المشركين"},
+  {num:44,ar:"الدخان",fr:"Ad-Dukhan",en:"Ad-Dukhan",ayahs:59,juz:25,type:"Mecquoise",typeEn:"Meccan",themeAr:"الدخان يوم القيامة",prophets:["موسى"],context:"علامة من علامات القيامة"},
+  {num:45,ar:"الجاثية",fr:"Al-Jathiya",en:"Al-Jathiya",ayahs:37,juz:25,type:"Mecquoise",typeEn:"Meccan",themeAr:"جثو الخلائق يوم الحساب",prophets:["موسى"],context:"الحساب والجزاء"},
+  {num:46,ar:"الأحقاف",fr:"Al-Ahqaf",en:"Al-Ahqaf",ayahs:35,juz:26,type:"Mecquoise",typeEn:"Meccan",themeAr:"قوم عاد وهود",prophets:["هود"],context:"قصة عاد وهود"},
+  {num:47,ar:"محمد",fr:"Muhammad",en:"Muhammad",ayahs:38,juz:26,type:"Médinoise",typeEn:"Medinan",themeAr:"الجهاد وأحكامه",prophets:[],context:"الجهاد وأحكام الحرب"},
+  {num:48,ar:"الفتح",fr:"Al-Fath",en:"Al-Fath",ayahs:29,juz:26,type:"Médinoise",typeEn:"Medinan",themeAr:"فتح مكة وصلح الحديبية",prophets:[],context:"صلح الحديبية وفتح مكة"},
+  {num:49,ar:"الحجرات",fr:"Al-Hujurat",en:"Al-Hujurat",ayahs:18,juz:26,type:"Médinoise",typeEn:"Medinan",themeAr:"آداب الإسلام",prophets:[],context:"آداب التعامل مع النبي"},
+  {num:50,ar:"ق",fr:"Qaf",en:"Qaf",ayahs:45,juz:26,type:"Mecquoise",typeEn:"Meccan",themeAr:"البعث والحساب",prophets:[],context:"إثبات البعث"},
+  {num:51,ar:"الذاريات",fr:"Adh-Dhariyat",en:"Adh-Dhariyat",ayahs:60,juz:26,type:"Mecquoise",typeEn:"Meccan",themeAr:"الذاريات والقيامة",prophets:["إبراهيم","موسى","نوح","لوط"],context:"قسم بالرياح وإثبات القيامة"},
+  {num:52,ar:"الطور",fr:"At-Tur",en:"At-Tur",ayahs:49,juz:27,type:"Mecquoise",typeEn:"Meccan",themeAr:"الطور والقيامة",prophets:[],context:"أقسام وإثبات العذاب"},
+  {num:53,ar:"النجم",fr:"An-Najm",en:"An-Najm",ayahs:62,juz:27,type:"Mecquoise",typeEn:"Meccan",themeAr:"النجم والوحي",prophets:[],context:"نزول الوحي على النبي"},
+  {num:54,ar:"القمر",fr:"Al-Qamar",en:"Al-Qamar",ayahs:55,juz:27,type:"Mecquoise",typeEn:"Meccan",themeAr:"القمر والساعة",prophets:["نوح","هود","لوط","موسى","صالح"],context:"انشقاق القمر"},
+  {num:55,ar:"الرحمن",fr:"Ar-Rahman",en:"Ar-Rahman",ayahs:78,juz:27,type:"Médinoise",typeEn:"Medinan",themeAr:"نعم الله",prophets:[],context:"عروس القرآن"},
+  {num:56,ar:"الواقعة",fr:"Al-Waqia",en:"Al-Waqia",ayahs:96,juz:27,type:"Mecquoise",typeEn:"Meccan",themeAr:"يوم القيامة",prophets:[],context:"أصحاب اليمين والشمال"},
+  {num:57,ar:"الحديد",fr:"Al-Hadid",en:"Al-Hadid",ayahs:29,juz:27,type:"Médinoise",typeEn:"Medinan",themeAr:"الجهاد والنفقة",prophets:["موسى","عيسى"],context:"إنفاق في سبيل الله"},
+  {num:58,ar:"المجادلة",fr:"Al-Mujadila",en:"Al-Mujadila",ayahs:22,juz:28,type:"Médinoise",typeEn:"Medinan",themeAr:"الظهار وأحكامه",prophets:[],context:"قصة المرأة التي جادلت"},
+  {num:59,ar:"الحشر",fr:"Al-Hashr",en:"Al-Hashr",ayahs:24,juz:28,type:"Médinoise",typeEn:"Medinan",themeAr:"أسماء الله الحسنى",prophets:[],context:"بنو النضير"},
+  {num:60,ar:"الممتحنة",fr:"Al-Mumtahana",en:"Al-Mumtahana",ayahs:13,juz:28,type:"Médinoise",typeEn:"Medinan",themeAr:"موالاة المؤمنين",prophets:["إبراهيم"],context:"هجرة المؤمنات"},
+  {num:61,ar:"الصف",fr:"As-Saff",en:"As-Saff",ayahs:14,juz:28,type:"Médinoise",typeEn:"Medinan",themeAr:"الجهاد بالصف",prophets:["موسى","عيسى"],context:"القتال بالصف"},
+  {num:62,ar:"الجمعة",fr:"Al-Jumua",en:"Al-Jumua",ayahs:11,juz:28,type:"Médinoise",typeEn:"Medinan",themeAr:"صلاة الجمعة",prophets:["موسى"],context:"حكم صلاة الجمعة"},
+  {num:63,ar:"المنافقون",fr:"Al-Munafiqun",en:"Al-Munafiqun",ayahs:11,juz:28,type:"Médinoise",typeEn:"Medinan",themeAr:"صفات المنافقين",prophets:[],context:"عبد الله بن أبي"},
+  {num:64,ar:"التغابن",fr:"At-Taghabun",en:"At-Taghabun",ayahs:18,juz:28,type:"Médinoise",typeEn:"Medinan",themeAr:"يوم التغابن",prophets:[],context:"التوكل والأسرة"},
+  {num:65,ar:"الطلاق",fr:"At-Talaq",en:"At-Talaq",ayahs:12,juz:28,type:"Médinoise",typeEn:"Medinan",themeAr:"أحكام الطلاق",prophets:[],context:"عدة الطلاق"},
+  {num:66,ar:"التحريم",fr:"At-Tahrim",en:"At-Tahrim",ayahs:12,juz:28,type:"Médinoise",typeEn:"Medinan",themeAr:"تحريم الحلال",prophets:["موسى","عيسى","نوح"],context:"حادثة تحريم العسل"},
+  {num:67,ar:"الملك",fr:"Al-Mulk",en:"Al-Mulk",ayahs:30,juz:29,type:"Mecquoise",typeEn:"Meccan",themeAr:"ملك الله",prophets:[],context:"تحمي من عذاب القبر"},
+  {num:68,ar:"القلم",fr:"Al-Qalam",en:"Al-Qalam",ayahs:52,juz:29,type:"Mecquoise",typeEn:"Meccan",themeAr:"القلم والعلم",prophets:["يونس"],context:"رد على اتهامات المشركين"},
+  {num:69,ar:"الحاقة",fr:"Al-Haqqa",en:"Al-Haqqa",ayahs:52,juz:29,type:"Mecquoise",typeEn:"Meccan",themeAr:"يوم القيامة الحق",prophets:["نوح","موسى"],context:"أهوال يوم القيامة"},
+  {num:70,ar:"المعارج",fr:"Al-Maarij",en:"Al-Maarij",ayahs:44,juz:29,type:"Mecquoise",typeEn:"Meccan",themeAr:"معارج الصعود",prophets:[],context:"العذاب والصبر"},
+  {num:71,ar:"نوح",fr:"Nuh",en:"Nuh",ayahs:28,juz:29,type:"Mecquoise",typeEn:"Meccan",themeAr:"دعوة نوح",prophets:["نوح"],context:"قصة دعوة نوح"},
+  {num:72,ar:"الجن",fr:"Al-Jinn",en:"Al-Jinn",ayahs:28,juz:29,type:"Mecquoise",typeEn:"Meccan",themeAr:"إسلام الجن",prophets:[],context:"استماع الجن للقرآن"},
+  {num:73,ar:"المزمل",fr:"Al-Muzzammil",en:"Al-Muzzammil",ayahs:20,juz:29,type:"Mecquoise",typeEn:"Meccan",themeAr:"قيام الليل",prophets:["موسى"],context:"أمر النبي بقيام الليل"},
+  {num:74,ar:"المدثر",fr:"Al-Muddaththir",en:"Al-Muddaththir",ayahs:56,juz:29,type:"Mecquoise",typeEn:"Meccan",themeAr:"الإنذار والتبليغ",prophets:[],context:"أوائل الوحي"},
+  {num:75,ar:"القيامة",fr:"Al-Qiyama",en:"Al-Qiyama",ayahs:40,juz:29,type:"Mecquoise",typeEn:"Meccan",themeAr:"يوم القيامة",prophets:[],context:"البعث والحساب"},
+  {num:76,ar:"الإنسان",fr:"Al-Insan",en:"Al-Insan",ayahs:31,juz:29,type:"Médinoise",typeEn:"Medinan",themeAr:"نعيم الجنة",prophets:[],context:"الأبرار وجزاؤهم"},
+  {num:77,ar:"المرسلات",fr:"Al-Mursalat",en:"Al-Mursalat",ayahs:50,juz:29,type:"Mecquoise",typeEn:"Meccan",themeAr:"الوعيد والقسم",prophets:[],context:"ويل يومئذ للمكذبين"},
+  {num:78,ar:"النبأ",fr:"An-Naba",en:"An-Naba",ayahs:40,juz:30,type:"Mecquoise",typeEn:"Meccan",themeAr:"النبأ العظيم",prophets:[],context:"جزء عمّ - البعث"},
+  {num:79,ar:"النازعات",fr:"An-Naziat",en:"An-Naziat",ayahs:46,juz:30,type:"Mecquoise",typeEn:"Meccan",themeAr:"الملائكة والبعث",prophets:["موسى"],context:"الملائكة وأهوال الموت"},
+  {num:80,ar:"عبس",fr:"Abasa",en:"Abasa",ayahs:42,juz:30,type:"Mecquoise",typeEn:"Meccan",themeAr:"الأعمى والنبي",prophets:[],context:"أدب مع طلاب العلم"},
+  {num:81,ar:"التكوير",fr:"At-Takwir",en:"At-Takwir",ayahs:29,juz:30,type:"Mecquoise",typeEn:"Meccan",themeAr:"تكوير الشمس والقيامة",prophets:[],context:"أشراط الساعة"},
+  {num:82,ar:"الانفطار",fr:"Al-Infitar",en:"Al-Infitar",ayahs:19,juz:30,type:"Mecquoise",typeEn:"Meccan",themeAr:"انفطار السماء يوم القيامة",prophets:[],context:"يوم القيامة والحساب"},
+  {num:83,ar:"المطففين",fr:"Al-Mutaffifin",en:"Al-Mutaffifin",ayahs:36,juz:30,type:"Mecquoise",typeEn:"Meccan",themeAr:"الغش في الميزان",prophets:[],context:"التحذير من الغش"},
+  {num:84,ar:"الانشقاق",fr:"Al-Inshiqaq",en:"Al-Inshiqaq",ayahs:25,juz:30,type:"Mecquoise",typeEn:"Meccan",themeAr:"انشقاق السماء",prophets:[],context:"أهوال يوم القيامة"},
+  {num:85,ar:"البروج",fr:"Al-Buruj",en:"Al-Buruj",ayahs:22,juz:30,type:"Mecquoise",typeEn:"Meccan",themeAr:"أصحاب الأخدود",prophets:[],context:"أصحاب الأخدود"},
+  {num:86,ar:"الطارق",fr:"At-Tariq",en:"At-Tariq",ayahs:17,juz:30,type:"Mecquoise",typeEn:"Meccan",themeAr:"الطارق والبعث",prophets:[],context:"النجم الثاقب"},
+  {num:87,ar:"الأعلى",fr:"Al-Ala",en:"Al-Ala",ayahs:19,juz:30,type:"Mecquoise",typeEn:"Meccan",themeAr:"تسبيح الله",prophets:["إبراهيم","موسى"],context:"يُقرأ في صلاة الجمعة"},
+  {num:88,ar:"الغاشية",fr:"Al-Ghashiya",en:"Al-Ghashiya",ayahs:26,juz:30,type:"Mecquoise",typeEn:"Meccan",themeAr:"يوم القيامة الغاشية",prophets:[],context:"وجوه خاشعة ووجوه ناعمة"},
+  {num:89,ar:"الفجر",fr:"Al-Fajr",en:"Al-Fajr",ayahs:30,juz:30,type:"Mecquoise",typeEn:"Meccan",themeAr:"الفجر والأمم السابقة",prophets:[],context:"قصص عاد وثمود وفرعون"},
+  {num:90,ar:"البلد",fr:"Al-Balad",en:"Al-Balad",ayahs:20,juz:30,type:"Mecquoise",typeEn:"Meccan",themeAr:"مكة والإنسان",prophets:[],context:"مكة المكرمة"},
+  {num:91,ar:"الشمس",fr:"Ash-Shams",en:"Ash-Shams",ayahs:15,juz:30,type:"Mecquoise",typeEn:"Meccan",themeAr:"الشمس والنفس",prophets:["صالح"],context:"تزكية النفس وثمود"},
+  {num:92,ar:"الليل",fr:"Al-Layl",en:"Al-Layl",ayahs:21,juz:30,type:"Mecquoise",typeEn:"Meccan",themeAr:"الخير والشر",prophets:[],context:"الجزاء على العمل"},
+  {num:93,ar:"الضحى",fr:"Ad-Duha",en:"Ad-Duha",ayahs:11,juz:30,type:"Mecquoise",typeEn:"Meccan",themeAr:"طمأنة النبي",prophets:[],context:"مواساة النبي"},
+  {num:94,ar:"الشرح",fr:"Al-Inshirah",en:"Al-Inshirah",ayahs:8,juz:30,type:"Mecquoise",typeEn:"Meccan",themeAr:"شرح الصدر",prophets:[],context:"التخفيف عن النبي"},
+  {num:95,ar:"التين",fr:"At-Tin",en:"At-Tin",ayahs:8,juz:30,type:"Mecquoise",typeEn:"Meccan",themeAr:"التين والزيتون",prophets:[],context:"خلق الإنسان في أحسن تقويم"},
+  {num:96,ar:"العلق",fr:"Al-Alaq",en:"Al-Alaq",ayahs:19,juz:30,type:"Mecquoise",typeEn:"Meccan",themeAr:"أول ما نزل",prophets:[],context:"أول آية نزلت على النبي"},
+  {num:97,ar:"القدر",fr:"Al-Qadr",en:"Al-Qadr",ayahs:5,juz:30,type:"Mecquoise",typeEn:"Meccan",themeAr:"ليلة القدر",prophets:[],context:"ليلة خير من ألف شهر"},
+  {num:98,ar:"البينة",fr:"Al-Bayyina",en:"Al-Bayyina",ayahs:8,juz:30,type:"Médinoise",typeEn:"Medinan",themeAr:"البينة والدين القيم",prophets:[],context:"أهل الكتاب والمشركون"},
+  {num:99,ar:"الزلزلة",fr:"Az-Zalzala",en:"Az-Zalzala",ayahs:8,juz:30,type:"Médinoise",typeEn:"Medinan",themeAr:"زلزلة الأرض",prophets:[],context:"حساب الذرة"},
+  {num:100,ar:"العاديات",fr:"Al-Adiyat",en:"Al-Adiyat",ayahs:11,juz:30,type:"Mecquoise",typeEn:"Meccan",themeAr:"العاديات والنفس",prophets:[],context:"كنود الإنسان"},
+  {num:101,ar:"القارعة",fr:"Al-Qaria",en:"Al-Qaria",ayahs:11,juz:30,type:"Mecquoise",typeEn:"Meccan",themeAr:"قارعة القيامة",prophets:[],context:"يوم القيامة"},
+  {num:102,ar:"التكاثر",fr:"At-Takathur",en:"At-Takathur",ayahs:8,juz:30,type:"Mecquoise",typeEn:"Meccan",themeAr:"التكاثر في الدنيا",prophets:[],context:"التحذير من الانشغال بالدنيا"},
+  {num:103,ar:"العصر",fr:"Al-Asr",en:"Al-Asr",ayahs:3,juz:30,type:"Mecquoise",typeEn:"Meccan",themeAr:"قسم العصر",prophets:[],context:"أقصر سور القرآن تقريباً"},
+  {num:104,ar:"الهمزة",fr:"Al-Humaza",en:"Al-Humaza",ayahs:9,juz:30,type:"Mecquoise",typeEn:"Meccan",themeAr:"الهمازون اللمازون",prophets:[],context:"التحذير من الغيبة والمال"},
+  {num:105,ar:"الفيل",fr:"Al-Fil",en:"Al-Fil",ayahs:5,juz:30,type:"Mecquoise",typeEn:"Meccan",themeAr:"أصحاب الفيل",prophets:[],context:"هجوم أبرهة على الكعبة"},
+  {num:106,ar:"قريش",fr:"Quraish",en:"Quraish",ayahs:4,juz:30,type:"Mecquoise",typeEn:"Meccan",themeAr:"نعمة الله على قريش",prophets:[],context:"نعمة الأمن والرزق لقريش"},
+  {num:107,ar:"الماعون",fr:"Al-Maun",en:"Al-Maun",ayahs:7,juz:30,type:"Mecquoise",typeEn:"Meccan",themeAr:"الماعون واليتيم",prophets:[],context:"التحذير من رياء الصلاة"},
+  {num:108,ar:"الكوثر",fr:"Al-Kawthar",en:"Al-Kawthar",ayahs:3,juz:30,type:"Mecquoise",typeEn:"Meccan",themeAr:"الكوثر",prophets:[],context:"أقصر سورة"},
+  {num:109,ar:"الكافرون",fr:"Al-Kafirun",en:"Al-Kafirun",ayahs:6,juz:30,type:"Mecquoise",typeEn:"Meccan",themeAr:"البراءة من الكافرين",prophets:[],context:"ربع القرآن"},
+  {num:110,ar:"النصر",fr:"An-Nasr",en:"An-Nasr",ayahs:3,juz:30,type:"Médinoise",typeEn:"Medinan",themeAr:"الفتح والنصر",prophets:[],context:"آخر سور نزلت"},
+  {num:111,ar:"المسد",fr:"Al-Masad",en:"Al-Masad",ayahs:5,juz:30,type:"Mecquoise",typeEn:"Meccan",themeAr:"أبو لهب وامرأته",prophets:[],context:"وعيد أبو لهب"},
+  {num:112,ar:"الإخلاص",fr:"Al-Ikhlas",en:"Al-Ikhlas",ayahs:4,juz:30,type:"Mecquoise",typeEn:"Meccan",themeAr:"التوحيد الخالص",prophets:[],context:"تعدل ثلث القرآن"},
+  {num:113,ar:"الفلق",fr:"Al-Falaq",en:"Al-Falaq",ayahs:5,juz:30,type:"Mecquoise",typeEn:"Meccan",themeAr:"الاستعاذة من الشر",prophets:[],context:"المعوذتان"},
+  {num:114,ar:"الناس",fr:"An-Nas",en:"An-Nas",ayahs:6,juz:30,type:"Mecquoise",typeEn:"Meccan",themeAr:"الاستعاذة من الوسواس",prophets:[],context:"المعوذتان - آخر القرآن"},
+];
+</script>
+
+<script>
+/* ════ VERSES — Base statique ════ */
+const VERSES=[
+  {v:"الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ",n:1,a:2,d:1},
+  {v:"إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ",n:1,a:5,d:2},
+  {v:"اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ",n:1,a:6,d:1},
+  {v:"ذَٰلِكَ الْكِتَابُ لَا رَيْبَ فِيهِ هُدًى لِّلْمُتَّقِينَ",n:2,a:2,d:2},
+  {v:"اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ لَا تَأْخُذُهُ سِنَةٌ وَلَا نَوْمٌ",n:2,a:255,d:1},
+  {v:"لَا إِكْرَاهَ فِي الدِّينِ قَد تَّبَيَّنَ الرُّشْدُ مِنَ الْغَيِّ",n:2,a:256,d:2},
+  {v:"آمَنَ الرَّسُولُ بِمَا أُنزِلَ إِلَيْهِ مِن رَّبِّهِ وَالْمُؤْمِنُونَ",n:2,a:285,d:3},
+  {v:"يَا أَيُّهَا الَّذِينَ آمَنُوا كُتِبَ عَلَيْكُمُ الصِّيَامُ",n:2,a:183,d:2},
+  {v:"وَإِذْ قَالَ مُوسَىٰ لِقَوْمِهِ إِنَّ اللَّهَ يَأْمُرُكُمْ أَن تَذْبَحُوا بَقَرَةً",n:2,a:67,d:2,mask:"بَقَرَةً"},
+  {v:"إِنَّ الدِّينَ عِندَ اللَّهِ الْإِسْلَامُ",n:3,a:19,d:1},
+  {v:"كُنتُمْ خَيْرَ أُمَّةٍ أُخْرِجَتْ لِلنَّاسِ",n:3,a:110,d:2},
+  {v:"إِنَّ اللَّهَ اصْطَفَىٰ آدَمَ وَنُوحًا وَآلَ إِبْرَاهِيمَ وَآلَ عِمْرَانَ عَلَى الْعَالَمِينَ",n:3,a:33,d:3,mask:"عِمْرَانَ"},
+  {v:"يَا أَيُّهَا النَّاسُ اتَّقُوا رَبَّكُمُ الَّذِي خَلَقَكُم مِّن نَّفْسٍ وَاحِدَةٍ وَاتَّقُوا اللَّهَ الَّذِي تَسَاءَلُونَ بِهِ وَالنِّسَاءَ",n:4,a:1,d:2,mask:"وَالنِّسَاءَ"},
+  {v:"الْيَوْمَ أَكْمَلْتُ لَكُمْ دِينَكُمْ وَأَتْمَمْتُ عَلَيْكُمْ نِعْمَتِي",n:5,a:3,d:2},
+  {v:"هَلْ يَسْتَطِيعُ رَبُّكَ أَن يُنَزِّلَ عَلَيْنَا مَائِدَةً مِّنَ السَّمَاءِ",n:5,a:112,d:3,mask:"مَائِدَةً"},
+  {v:"وَلِلَّهِ الْأَسْمَاءُ الْحُسْنَىٰ فَادْعُوهُ بِهَا",n:7,a:180,d:2},
+  {v:"وَبَيْنَهُمَا حِجَابٌ وَعَلَى الْأَعْرَافِ رِجَالٌ يَعْرِفُونَ كُلًّا بِسِيمَاهُمْ",n:7,a:46,d:3,mask:"الْأَعْرَافِ"},
+  {v:"يَسْأَلُونَكَ عَنِ الْأَنفَالِ قُلِ الْأَنفَالُ لِلَّهِ وَالرَّسُولِ",n:8,a:1,d:2,mask:"الْأَنفَالِ"},
+  {v:"وَإِذْ قَالَ يُوسُفُ لِأَبِيهِ يَا أَبَتِ إِنِّي رَأَيْتُ أَحَدَ عَشَرَ كَوْكَبًا",n:12,a:4,d:3,mask:"يُوسُفُ"},
+  {v:"وَإِذْ تَأَذَّنَ رَبُّكُمْ لَئِن شَكَرْتُمْ لَأَزِيدَنَّكُمْ",n:14,a:7,d:2},
+  {v:"الْحَمْدُ لِلَّهِ الَّذِي أَنزَلَ عَلَىٰ عَبْدِهِ الْكِتَابَ وَلَمْ يَجْعَل لَّهُ عِوَجًا",n:18,a:1,d:2},
+  {v:"وَاذْكُرْ فِي الْكِتَابِ مَرْيَمَ إِذِ انتَبَذَتْ مِنْ أَهْلِهَا مَكَانًا شَرْقِيًّا",n:19,a:16,d:3,mask:"مَرْيَمَ"},
+  {v:"كهيعص ذِكْرُ رَحْمَتِ رَبِّكَ عَبْدَهُ زَكَرِيَّا",n:19,a:1,d:2},
+  {v:"طه مَا أَنزَلْنَا عَلَيْكَ الْقُرْآنَ لِتَشْقَىٰ",n:20,a:1,d:1,mask:"طه"},
+  {v:"وَأَنَا اخْتَرْتُكَ فَاسْتَمِعْ لِمَا يُوحَىٰ إِنَّنِي أَنَا اللَّهُ لَا إِلَٰهَ إِلَّا أَنَا فَاعْبُدْنِي",n:20,a:13,d:3},
+  {v:"قَدْ أَفْلَحَ الْمُؤْمِنُونَ",n:23,a:1,d:1,mask:"الْمُؤْمِنُونَ"},
+  {v:"وَالَّذِينَ هُمْ عَلَىٰ صَلَوَاتِهِمْ يُحَافِظُونَ",n:23,a:9,d:2},
+  {v:"اللَّهُ نُورُ السَّمَاوَاتِ وَالْأَرْضِ مَثَلُ نُورِهِ كَمِشْكَاةٍ فِيهَا مِصْبَاحٌ",n:24,a:35,d:3},
+  {v:"وَالَّذِينَ اسْتَجَابُوا لِرَبِّهِمْ وَأَقَامُوا الصَّلَاةَ وَأَمْرُهُمْ شُورَىٰ بَيْنَهُمْ",n:42,a:38,d:3,mask:"شُورَىٰ"},
+  {v:"وَإِذْ قَالَ لُقْمَانُ لِابْنِهِ وَهُوَ يَعِظُهُ يَا بُنَيَّ لَا تُشْرِكْ بِاللَّهِ",n:31,a:13,d:2,mask:"لُقْمَانُ"},
+  {v:"يس وَالْقُرْآنِ الْحَكِيمِ",n:36,a:1,d:1,mask:"يس"},
+  {v:"إِنَّمَا أَمْرُهُ إِذَا أَرَادَ شَيْئًا أَن يَقُولَ لَهُ كُن فَيَكُونُ",n:36,a:82,d:2},
+  {v:"وَالصَّافَّاتِ صَفًّا فَالزَّاجِرَاتِ زَجْرًا فَالتَّالِيَاتِ ذِكْرًا",n:37,a:1,d:2,mask:"وَالصَّافَّاتِ"},
+  {v:"اقْتَرَبَتِ السَّاعَةُ وَانشَقَّ الْقَمَرُ",n:54,a:1,d:2,mask:"الْقَمَرُ"},
+  {v:"الرَّحْمَٰنُ عَلَّمَ الْقُرْآنَ",n:55,a:1,d:1,mask:"الرَّحْمَٰنُ"},
+  {v:"فَبِأَيِّ آلَاءِ رَبِّكُمَا تُكَذِّبَانِ",n:55,a:13,d:1},
+  {v:"إِذَا وَقَعَتِ الْوَاقِعَةُ",n:56,a:1,d:1,mask:"الْوَاقِعَةُ"},
+  {v:"هُوَ الْأَوَّلُ وَالْآخِرُ وَالظَّاهِرُ وَالْبَاطِنُ وَهُوَ بِكُلِّ شَيْءٍ عَلِيمٌ",n:57,a:3,d:3},
+  {v:"هُوَ اللَّهُ الَّذِي لَا إِلَٰهَ إِلَّا هُوَ عَالِمُ الْغَيْبِ وَالشَّهَادَةِ",n:59,a:22,d:2},
+  {v:"يَا أَيُّهَا الَّذِينَ آمَنُوا إِذَا نُودِيَ لِلصَّلَاةِ مِن يَوْمِ الْجُمُعَةِ",n:62,a:9,d:2,mask:"الْجُمُعَةِ"},
+  {v:"تَبَارَكَ الَّذِي بِيَدِهِ الْمُلْكُ وَهُوَ عَلَىٰ كُلِّ شَيْءٍ قَدِيرٌ",n:67,a:1,d:1,mask:"الْمُلْكُ"},
+  {v:"الَّذِي خَلَقَ الْمَوْتَ وَالْحَيَاةَ لِيَبْلُوَكُمْ أَيُّكُمْ أَحْسَنُ عَمَلًا",n:67,a:2,d:2},
+  {v:"الْحَاقَّةُ مَا الْحَاقَّةُ وَمَا أَدْرَاكَ مَا الْحَاقَّةُ",n:69,a:1,d:1,mask:"الْحَاقَّةُ"},
+  {v:"لَا أُقْسِمُ بِيَوْمِ الْقِيَامَةِ",n:75,a:1,d:2,mask:"الْقِيَامَةِ"},
+  {v:"هَلْ أَتَىٰ عَلَى الْإِنسَانِ حِينٌ مِّنَ الدَّهْرِ لَمْ يَكُن شَيْئًا مَّذْكُورًا",n:76,a:1,d:2,mask:"الْإِنسَانِ"},
+  {v:"عَمَّ يَتَسَاءَلُونَ عَنِ النَّبَإِ الْعَظِيمِ",n:78,a:1,d:1,mask:"النَّبَإِ"},
+  {v:"عَبَسَ وَتَوَلَّىٰ أَن جَاءَهُ الْأَعْمَىٰ",n:80,a:1,d:2,mask:"عَبَسَ"},
+  {v:"وَالسَّمَاءِ ذَاتِ الْبُرُوجِ",n:85,a:1,d:2,mask:"الْبُرُوجِ"},
+  {v:"وَالسَّمَاءِ وَالطَّارِقِ",n:86,a:1,d:2,mask:"الطَّارِقِ"},
+  {v:"سَبِّحِ اسْمَ رَبِّكَ الْأَعْلَى",n:87,a:1,d:1,mask:"الْأَعْلَى"},
+  {v:"هَلْ أَتَاكَ حَدِيثُ الْغَاشِيَةِ",n:88,a:1,d:2,mask:"الْغَاشِيَةِ"},
+  {v:"وَالْفَجْرِ وَلَيَالٍ عَشْرٍ",n:89,a:1,d:2,mask:"وَالْفَجْرِ"},
+  {v:"يَا أَيَّتُهَا النَّفْسُ الْمُطْمَئِنَّةُ ارْجِعِي إِلَىٰ رَبِّكِ رَاضِيَةً",n:89,a:27,d:1},
+  {v:"وَالشَّمْسِ وَضُحَاهَا",n:91,a:1,d:1,mask:"وَالشَّمْسِ"},
+  {v:"قَدْ أَفْلَحَ مَن زَكَّاهَا وَقَدْ خَابَ مَن دَسَّاهَا",n:91,a:9,d:3},
+  {v:"وَاللَّيْلِ إِذَا يَغْشَىٰ",n:92,a:1,d:2,mask:"وَاللَّيْلِ"},
+  {v:"وَالضُّحَىٰ وَاللَّيْلِ إِذَا سَجَىٰ",n:93,a:1,d:2,mask:"وَالضُّحَىٰ"},
+  {v:"أَلَمْ نَشْرَحْ لَكَ صَدْرَكَ",n:94,a:1,d:1},
+  {v:"فَإِنَّ مَعَ الْعُسْرِ يُسْرًا إِنَّ مَعَ الْعُسْرِ يُسْرًا",n:94,a:5,d:1},
+  {v:"وَالتِّينِ وَالزَّيْتُونِ",n:95,a:1,d:2,mask:"وَالتِّينِ"},
+  {v:"لَقَدْ خَلَقْنَا الْإِنسَانَ فِي أَحْسَنِ تَقْوِيمٍ",n:95,a:4,d:1},
+  {v:"اقْرَأْ بِاسْمِ رَبِّكَ الَّذِي خَلَقَ",n:96,a:1,d:1},
+  {v:"إِنَّا أَنزَلْنَاهُ فِي لَيْلَةِ الْقَدْرِ",n:97,a:1,d:1,mask:"الْقَدْرِ"},
+  {v:"لَيْلَةُ الْقَدْرِ خَيْرٌ مِّنْ أَلْفِ شَهْرٍ",n:97,a:3,d:1,mask:"الْقَدْرِ"},
+  {v:"إِذَا زُلْزِلَتِ الْأَرْضُ زِلْزَالَهَا",n:99,a:1,d:1},
+  {v:"فَمَن يَعْمَلْ مِثْقَالَ ذَرَّةٍ خَيْرًا يَرَهُ وَمَن يَعْمَلْ مِثْقَالَ ذَرَّةٍ شَرًّا يَرَهُ",n:99,a:7,d:1},
+  {v:"الْقَارِعَةُ مَا الْقَارِعَةُ",n:101,a:1,d:1,mask:"الْقَارِعَةُ"},
+  {v:"أَلْهَاكُمُ التَّكَاثُرُ",n:102,a:1,d:1,mask:"التَّكَاثُرُ"},
+  {v:"وَالْعَصْرِ إِنَّ الْإِنسَانَ لَفِي خُسْرٍ",n:103,a:1,d:1,mask:"وَالْعَصْرِ"},
+  {v:"أَلَمْ تَرَ كَيْفَ فَعَلَ رَبُّكَ بِأَصْحَابِ الْفِيلِ",n:105,a:1,d:1,mask:"الْفِيلِ"},
+  {v:"لِإِيلَافِ قُرَيْشٍ",n:106,a:1,d:1,mask:"قُرَيْشٍ"},
+  {v:"وَيَمْنَعُونَ الْمَاعُونَ",n:107,a:7,d:2,mask:"الْمَاعُونَ"},
+  {v:"إِنَّا أَعْطَيْنَاكَ الْكَوْثَرَ",n:108,a:1,d:1,mask:"الْكَوْثَرَ"},
+  {v:"قُلْ يَا أَيُّهَا الْكَافِرُونَ",n:109,a:1,d:1,mask:"الْكَافِرُونَ"},
+  {v:"لَكُمْ دِينُكُمْ وَلِيَ دِينِ",n:109,a:6,d:1},
+  {v:"إِذَا جَاءَ نَصْرُ اللَّهِ وَالْفَتْحُ",n:110,a:1,d:1},
+  {v:"تَبَّتْ يَدَا أَبِي لَهَبٍ وَتَبَّ",n:111,a:1,d:2,mask:"لَهَبٍ"},
+  {v:"فِي جِيدِهَا حَبْلٌ مِّن مَّسَدٍ",n:111,a:5,d:2,mask:"مَّسَدٍ"},
+  {v:"قُلْ هُوَ اللَّهُ أَحَدٌ",n:112,a:1,d:1},
+  {v:"اللَّهُ الصَّمَدُ",n:112,a:2,d:1},
+  {v:"قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ",n:113,a:1,d:1,mask:"الْفَلَقِ"},
+  {v:"قُلْ أَعُوذُ بِرَبِّ النَّاسِ",n:114,a:1,d:1,mask:"النَّاسِ"},
+  {v:"مَلِكِ النَّاسِ إِلَٰهِ النَّاسِ",n:114,a:2,d:2,mask:"النَّاسِ"},
+  {v:"مِن شَرِّ الْوَسْوَاسِ الْخَنَّاسِ",n:114,a:4,d:2},
+];
+</script>
+
+<script>
+/* ════ MASK_DB — versets contenant le nom de leur sourate ════ */
+const MASK_DB=new Set([
+  "2:67","2:68","2:69","2:70","2:71","3:33","3:35","4:1","4:3","4:7","4:15",
+  "5:112","5:114","6:136","6:138","6:142","7:46","7:48","8:1","9:104","9:117",
+  "10:98","11:50","11:53","11:58","11:60",
+  "12:4","12:7","12:9","12:21","12:46","12:56","12:84","12:90",
+  "13:13","14:1","14:35","15:80","16:68","16:69","17:1","18:9","18:10","18:25",
+  "19:16","19:27","19:34","20:1","22:27","22:28","23:1","23:57","24:35","24:40",
+  "25:1","26:224","27:18","28:25","29:41","30:2","30:3","31:12","31:13",
+  "32:15","33:20","33:22","34:15","35:1","36:1","37:1","37:165","38:1",
+  "39:71","39:73","40:3","41:3","41:44","42:38","43:35","44:10","45:28",
+  "46:21","47:2","48:1","48:18","48:27","49:4","50:1","51:1","52:1","53:1",
+  "54:1","55:1","56:1","56:2","57:25","58:1","59:2","60:10","61:4","62:9",
+  "63:1","64:9","65:1","66:1","67:1","68:1","69:1","69:2","69:3","70:3",
+  "71:1","71:21","71:26","72:1","72:6","73:1","74:1","75:1","75:6","76:1",
+  "77:1","78:2","79:1","80:1","81:1","82:1","83:1","84:1","85:1","86:1","86:2",
+  "87:1","88:1","89:1","90:1","90:2","91:1","92:1","93:1","94:1","95:1","96:2",
+  "97:1","97:2","97:3","98:1","98:4","99:1","100:1","101:1","101:2","101:3",
+  "102:1","103:1","104:1","105:1","106:1","107:7","108:1","109:1","110:1",
+  "111:5","113:1","114:1","114:3","114:5",
+]);
+
+/* ════ NORMALISATION ARABE ════ */
+function normalizeArabic(text){
+  if(!text) return '';
+  return text
+    .replace(/[\u064B-\u065F\u0670\u0640\u06D6-\u06DC\u06DF-\u06E4\u06E7\u06E8\u06EA-\u06ED]/g,'')
+    .replace(/[أإآٱ]/g,'ا').replace(/ى/g,'ي').replace(/ة/g,'ه')
+    .replace(/ؤ/g,'و').replace(/ئ/g,'ي')
+    .replace(/(^|\s)ال/g,'$1')
+    .replace(/[^\u0600-\u06FF\s]/g,'').trim();
+}
+
+/* ════ MASKING ════ */
+const SACRED_WORDS_SET=new Set(['الله','رب','الرحمن','الرحيم','النبي','الرسول']);
+function _isSacred(token){const n=normalizeArabic(token);for(const s of SACRED_WORDS_SET){if(normalizeArabic(s)===n)return true;}return false;}
+function _isDelimiter(token){return /^[\s\u06D4\u06D6-\u06DC\u06DF-\u06E4۞۩،؟!:.\u200c\u200d\u200f]+$/.test(token);}
+function _maskSpan(arabicToken){
+  const letters=(arabicToken||'').replace(/[^\u0600-\u06FF]/g,'');
+  const len=Math.max(2,Math.min(letters.length,9));
+  return `<span class="name-mask" dir="rtl" aria-label="كلمة مخفية" title="؟">${'░'.repeat(len)}</span>`;
+}
+function _tokenize(text){return text.split(/([ \t\n\r\u00A0\u06D4\u06D6-\u06DC\u06DF-\u06E4۞۩،؟!:.\u200c\u200d\u200f]+)/);}
+function _findTokenByNorm(tokens,normTarget,allowSacred){
+  if(!normTarget||normTarget.length<2) return -1;
+  return tokens.findIndex(t=>{
+    if(_isDelimiter(t)) return false;
+    if(!allowSacred&&_isSacred(t)) return false;
+    return normalizeArabic(t)===normTarget;
+  });
+}
+function escapeHTML(str){return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+function maskSurahNameInVerse(verseText,verse,surahInfo){
+  const tokens=_tokenize(verseText);
+  const verseKey=`${surahInfo.num}:${verse.a}`;
+  const isInMaskDB=MASK_DB.has(verseKey);
+  const isApiVerse=!verse.mask&&!VERSES.some(v=>v.n===verse.n&&v.a===verse.a&&v.mask);
+
+  if(verse.mask){
+    const maskNorm=normalizeArabic(verse.mask);
+    const idx=_findTokenByNorm(tokens,maskNorm,true);
+    if(idx!==-1){
+      return escapeHTML(tokens.slice(0,idx).join(''))+_maskSpan(tokens[idx])+escapeHTML(tokens.slice(idx+1).join(''));
+    }
+  }
+  const surahNorm=normalizeArabic(surahInfo.ar);
+  if(surahNorm.length>=2){
+    const allowSacred=isInMaskDB||_isSacred(surahInfo.ar);
+    const idx=_findTokenByNorm(tokens,surahNorm,allowSacred);
+    if(idx!==-1){
+      return escapeHTML(tokens.slice(0,idx).join(''))+_maskSpan(tokens[idx])+escapeHTML(tokens.slice(idx+1).join(''));
+    }
+    if(isApiVerse&&!isInMaskDB) return escapeHTML(verseText);
+  }
+  return escapeHTML(verseText);
+}
+
+/* ── MASQUAGE IA (CAS 3 — uniquement si dans MASK_DB) ── */
+const AI_API_KEY='';
+const _aiMaskCache=new Map();
+let _aiEnabled=true;
+async function _detectMaskWithAI(verseText,surahInfo){
+  const cacheKey=`${surahInfo.num}:${verseText.slice(0,60)}`;
+  if(_aiMaskCache.has(cacheKey)) return _aiMaskCache.get(cacheKey);
+  if(!_aiEnabled) return null;
+  const prompt=`Tu es un expert en morphologie coranique arabe. Réponds de façon ultra-concise.\n\nVerset : ${verseText}\nSourate : ${surahInfo.ar} (n°${surahInfo.num})\n\nLe nom de cette sourate, ou sa forme déclinée, apparaît-il dans ce verset ?\n• Si OUI : copie le token EXACTEMENT tel qu'il figure dans le verset — caractère par caractère, harakat compris.\n• Si NON : réponds uniquement null.`;
+  try{
+    const headers={'Content-Type':'application/json'};
+    if(AI_API_KEY){headers['x-api-key']=AI_API_KEY;headers['anthropic-version']='2023-06-01';headers['anthropic-dangerous-direct-browser-access']='true';}
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',headers,
+      body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:40,messages:[{role:'user',content:prompt}]}),
+    });
+    if(!res.ok){if(res.status===401||res.status===403)_aiEnabled=false;_aiMaskCache.set(cacheKey,null);return null;}
+    const data=await res.json();
+    const raw=(data.content?.[0]?.text||'').trim();
+    const cleaned=raw.replace(/^["'`«»]+|["'`«»]+$/g,'').trim();
+    const token=(cleaned==='null'||cleaned===''||cleaned.includes(' '))?null:cleaned;
+    _aiMaskCache.set(cacheKey,token); return token;
+  }catch(e){_aiMaskCache.set(cacheKey,null);return null;}
+}
+async function _applyAIMask(elementId,verse,surahInfo){
+  const token=await _detectMaskWithAI(verse.v,surahInfo);
+  if(!token) return;
+  const tokenNorm=normalizeArabic(token);
+  if(!tokenNorm||tokenNorm.length<2) return;
+  const tokens=_tokenize(verse.v);
+  const idx=_findTokenByNorm(tokens,tokenNorm,true);
+  if(idx===-1) return;
+  const maskedHTML=escapeHTML(tokens.slice(0,idx).join(''))+_maskSpan(tokens[idx])+escapeHTML(tokens.slice(idx+1).join(''));
+  const el=document.getElementById(elementId);
+  if(el&&!el.innerHTML.includes('name-mask')) el.innerHTML=maskedHTML;
+}
+
+/* ════ ANALYSE SÉMANTIQUE + DISTRACTEURS ════ */
+const THEMATIC_KEYWORDS=['فرعون','جنه','نار','جهنم','قيامه','ملائكه','شيطان','ابليس','كعبه','صلاه','زكاه','صوم','حج','كتاب','قران','توراه','انجيل','منافق','سليمان','داود','يونس','لوط','يعقوب','اسماعيل','اسحاق','هود','صالح'];
+function analyzeVerse(verseText){
+  const norm=normalizeArabic(verseText);
+  const detectedProphets=[],detectedKeywords=[];
+  const prophetSet=new Map();
+  SURAHS.forEach(s=>s.prophets?.forEach(p=>{const pn=normalizeArabic(p);if(pn.length>=3)prophetSet.set(pn,p);}));
+  prophetSet.forEach((_,pNorm)=>{if(norm.includes(pNorm)&&!detectedProphets.includes(pNorm))detectedProphets.push(pNorm);});
+  THEMATIC_KEYWORDS.forEach(kw=>{const kwn=normalizeArabic(kw);if(norm.includes(kwn)&&!detectedKeywords.includes(kwn))detectedKeywords.push(kwn);});
+  return {detectedProphets,detectedKeywords};
+}
+function getSmartDistractors(verse,surahInfo){
+  const correctNum=surahInfo.num,correctAyahs=surahInfo.ayahs,{juz,type}=surahInfo;
+  const {detectedProphets,detectedKeywords}=analyzeVerse(verse.v);
+  const scored=SURAHS.filter(s=>s.num!==correctNum).map(s=>{
+    let score=0;
+    score+=Math.abs(s.juz-juz)*3;
+    const ratio=Math.max(s.ayahs,correctAyahs)/Math.min(s.ayahs,correctAyahs);
+    if(ratio>10)score+=20;else if(ratio>5)score+=10;else if(ratio>3)score+=4;else score-=3;
+    if(s.type===type)score-=3; if(juz===30&&s.juz===30)score-=8;
+    const sProphNorm=s.prophets?.map(p=>normalizeArabic(p))||[];
+    detectedProphets.forEach(dp=>{if(sProphNorm.some(sp=>sp.includes(dp)||dp.includes(sp)))score-=14;});
+    const fields=normalizeArabic((s.themeAr||'')+' '+(s.context||''));
+    detectedKeywords.forEach(kw=>{if(fields.includes(kw))score-=8;});
+    score+=Math.random()*4;
+    return {surah:s,score};
+  });
+  scored.sort((a,b)=>a.score-b.score);
+  return scored.slice(0,3).map(x=>x.surah);
+}
+</script>
+
+<script>
+/* ═══════════════════════════════════════════════════════════
+   NOUVEAU SYSTÈME D'INDICES DEVINETTE v8.3
+   — Remplace le pourcentage abstrait —
+   
+   4 indices progressifs et cumulatifs :
+   1. Direction (avant / après dans l'ordre du Coran) + distance
+   2. Numéro de Juz de la bonne réponse
+   3. Type de sourate (mecquoise / médinoise)
+   4. Nombre de versets exact
+═══════════════════════════════════════════════════════════ */
+
+/**
+ * Retourne les données d'un indice pour une tentative donnée.
+ * @param {number} attemptNum   1-indexed (1=premier essai faux)
+ * @param {number} guessNum     numéro de sourate devinée
+ * @param {object} correctSurah sourate correcte
+ * @returns {{ label, value, icon }}
+ */
+function getHintForAttempt(attemptNum, guessNum, correctSurah) {
+  const dist = Math.abs(guessNum - correctSurah.num);
+  switch(attemptNum) {
+    case 1: {
+      /* Indice 1 : direction dans le Coran + distance */
+      const after = guessNum < correctSurah.num;
+      const dirText = after ? t('hintDirectionAfter') : t('hintDirectionBefore');
+      const distText = dist === 1
+        ? (currentLang==='ar' ? 'مسافة ١ سورة' : currentLang==='en' ? '1 surah away' : '1 sourate d\'écart')
+        : (currentLang==='ar' ? `مسافة ${dist} سورة` : currentLang==='en' ? `${dist} surahs away` : `${dist} sourates d'écart`);
+      return {
+        icon: after ? '→' : '←',
+        label: t('hintDirection'),
+        value: `${dirText} · ${distText}`
+      };
+    }
+    case 2: {
+      /* Indice 2 : Juz */
+      return {
+        icon: '#',
+        label: t('hintJuz'),
+        value: currentLang==='ar'
+          ? `الجزء ${correctSurah.juz}`
+          : currentLang==='en'
+          ? `Juz ${correctSurah.juz}`
+          : `Juz ${correctSurah.juz}`
+      };
+    }
+    case 3: {
+      /* Indice 3 : Type mecquoise/médinoise */
+      const typeStr = currentLang==='en' ? correctSurah.typeEn : correctSurah.type;
+      return {
+        icon: '?',
+        label: t('hintType'),
+        value: typeStr
+      };
+    }
+    case 4: {
+      /* Indice 4 : Nombre de versets */
+      return {
+        icon: '~',
+        label: t('hintAyahs'),
+        value: correctSurah.ayahs + (currentLang==='ar' ? ' آية' : currentLang==='en' ? ' verses' : ' versets')
+      };
+    }
+    default:
+      return null;
+  }
+}
+
+/**
+ * Affiche (ou met à jour) la zone d'indices cumulés.
+ * Chaque essai faux ajoute un indice visible en bas.
+ */
+function _renderHints(hints) {
+  const area = document.getElementById('gv-hints-area');
+  area.innerHTML = '';
+  hints.forEach(h => {
+    const row = document.createElement('div');
+    row.className = 'gv-hint-row';
+    row.innerHTML =
+      `<span class="gv-hint-direction">${h.icon}</span>` +
+      `<span class="gv-hint-label">${h.label}</span>` +
+      `<span class="gv-hint-value">${h.value}</span>`;
+    area.appendChild(row);
+  });
+}
+</script>
+
+<script>
+/* ════ DECK & STATE ════ */
+function buildWeightedDeck(){
+  const weighted=[];
+  VERSES.forEach((v,i)=>{const w=v.d===3?3:v.d===2?2:1;for(let x=0;x<w;x++)weighted.push(i);});
+  return shuffle(weighted);
+}
+let state={
+  score:0,qNum:0,maxQ:10,shuffledDeck:[],deckPos:0,answered:false,usedVerseKeys:new Set(),
+  guessVerse:null,guessSurah:null,guessAttempts:0,guessSelected:null,currentMode:'qcm',
+  hintHistory:[], /* v8.3 : indices cumulés */
+};
+const SERIES_SIZES=[15,25,50,100,150,Infinity];
+let selectedSeries=15, selectedMode='qcm';
+
+/* ════ NAVIGATION ════ */
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');window.scrollTo(0,0);}
+function goHome(){showScreen('screen-home');applyLang();}
+function quitGame(){if(confirm(t('quitConfirm')))goHome();}
+
+/* ════ SETUP ════ */
+function goToSetup(){
+  const sel=document.getElementById('series-selector');sel.innerHTML='';
+  SERIES_SIZES.forEach(sz=>{
+    const btn=document.createElement('button');
+    btn.className='series-btn'+(sz===selectedSeries?' active':'');
+    btn.textContent=sz===Infinity?t('seriesInfinite'):sz;
+    btn.onclick=()=>{document.querySelectorAll('.series-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');selectedSeries=sz;};
+    sel.appendChild(btn);
+  });
+  const modesel=document.getElementById('mode-selector');
+  if(modesel){
+    modesel.innerHTML='';
+    ['qcm','devinette'].forEach(m=>{
+      const btn=document.createElement('button');
+      btn.className='mode-sel-btn'+(m===selectedMode?' active':'');
+      btn.dataset.mode=m;
+      btn.innerHTML=m==='qcm'
+        ?`<span class="msb-icon">Q</span><span class="msb-label">${t('modeQCM')}</span>`
+        :`<span class="msb-icon">?</span><span class="msb-label">${t('modeGuess')}</span>`;
+      btn.onclick=()=>{document.querySelectorAll('.mode-sel-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');selectedMode=m;};
+      modesel.appendChild(btn);
+    });
+  }
+  document.getElementById('setup-title').textContent=t('setupTitle');
+  document.getElementById('setup-sub').textContent=t('setupSub');
+  document.getElementById('setup-logo-sub').textContent=t('setupLogoSub');
+  document.getElementById('start-solo-btn').textContent=t('startSolo');
+  document.getElementById('setup-back-btn').textContent=t('backBtn');
+  showScreen('screen-setup');
+}
+function startFromSetup(){if(selectedMode==='devinette')startModeDevinette();else startMode1();}
+
+/* ════ MODE QCM ════ */
+function startMode1(){
+  state.score=0;state.qNum=0;state.maxQ=selectedSeries===Infinity?Infinity:selectedSeries;
+  state.answered=false;state.shuffledDeck=buildWeightedDeck();state.deckPos=0;
+  state.usedVerseKeys=new Set();state.currentMode='qcm';
+  document.getElementById('nav-menu-btn').textContent=t('navMenu');
+  document.getElementById('nav-quit-btn').textContent=t('navQuit');
+  document.getElementById('end-btn-txt').textContent=t('endGame');
+  showScreen('screen-quiz');loadQuestion();
+}
+
+async function loadQuestion(){
+  if(state.maxQ!==Infinity&&state.qNum>=state.maxQ){endQuiz();return;}
+  state.qNum++;state.answered=false;
+  document.getElementById('q-next').style.display='none';
+  document.getElementById('q-feedback').textContent='';
+  document.getElementById('q-feedback').className='feedback';
+  document.getElementById('q-num').textContent=state.qNum;
+  document.getElementById('q-total').textContent=state.maxQ===Infinity?'/∞':'/'+state.maxQ;
+  let verse=null,surahInfo=null;
+  for(let i=0;i<4;i++){
+    const candidate=QuranAPI.getBufferedVerse();
+    if(!candidate) break;
+    const info=SURAHS.find(s=>s.num===candidate.n);
+    if(!info) continue;
+    const key=`${candidate.n}:${candidate.a}`;
+    if(state.usedVerseKeys.has(key)) continue;
+    verse=candidate;surahInfo=info;state.usedVerseKeys.add(key);break;
+  }
+  if(!verse){
+    let tries=0;
+    while(tries<VERSES.length){
+      if(state.deckPos>=state.shuffledDeck.length){state.shuffledDeck=buildWeightedDeck();state.deckPos=0;}
+      const idx=state.shuffledDeck[state.deckPos++];
+      const v=VERSES[idx];const info=SURAHS.find(s=>s.num===v.n);
+      if(!info){tries++;continue;}
+      const key=`${v.n}:${v.a}`;
+      if(!state.usedVerseKeys.has(key)){verse=v;surahInfo=info;state.usedVerseKeys.add(key);break;}
+      tries++;
+    }
+    if(!verse){state.usedVerseKeys.clear();state.shuffledDeck=buildWeightedDeck();state.deckPos=0;const idx=state.shuffledDeck[state.deckPos++];verse=VERSES[idx];surahInfo=SURAHS.find(s=>s.num===verse.n);}
+  }
+  if(!surahInfo){loadQuestion();return;}
+  _renderQuestion(verse,surahInfo);
+}
+
+function _renderQuestion(verse,surahInfo){
+  const badge=document.getElementById('verse-diff-badge');
+  if(verse.d===1){badge.textContent=t('diffEasy');badge.className='diff-badge diff-easy';}
+  else if(verse.d===2){badge.textContent=t('diffMedium');badge.className='diff-badge diff-medium';}
+  else{badge.textContent=t('diffHard');badge.className='diff-badge diff-hard';}
+  const maskedVerse=maskSurahNameInVerse(verse.v,verse,surahInfo);
+  const verseEl=document.getElementById('q-verse');
+  verseEl.innerHTML=maskedVerse;
+  document.getElementById('q-question-label').textContent=t('questionLabel');
+  const verseKey=`${surahInfo.num}:${verse.a}`;
+  if(!maskedVerse.includes('name-mask')&&MASK_DB.has(verseKey)){_applyAIMask('q-verse',verse,surahInfo);}
+  const distractors=getSmartDistractors(verse,surahInfo);
+  const options=shuffle([surahInfo,...distractors]);
+  const grid=document.getElementById('q-options');grid.innerHTML='';
+  options.forEach(opt=>{
+    const btn=document.createElement('button');btn.className='option-btn';
+    const sub=currentLang==='en'?opt.en:currentLang==='ar'?'':opt.fr;
+    btn.innerHTML=`<span class="opt-ar">${opt.ar}</span>`+(sub?`<span class="opt-fr">${sub}</span>`:'');
+    btn.onclick=()=>selectAnswer(opt.num,surahInfo.num,btn);
+    grid.appendChild(btn);
+  });
+}
+
+function selectAnswer(chosen,correct,clickedBtn){
+  if(state.answered) return;
+  state.answered=true;
+  const btns=document.querySelectorAll('.option-btn');
+  btns.forEach(b=>b.disabled=true);
+  const fb=document.getElementById('q-feedback');
+  if(chosen===correct){
+    state.score++;
+    clickedBtn.classList.add('correct');
+    fb.textContent=t('correctFb');fb.className='feedback correct';
+    const scoreEl=document.getElementById('q-score');
+    scoreEl.textContent=state.score;
+    scoreEl.classList.remove('bump');void scoreEl.offsetWidth;scoreEl.classList.add('bump');
+    spawnScoreFloat('+1',clickedBtn);
+  } else {
+    clickedBtn.classList.add('wrong');
+    btns.forEach(b=>{const ar=b.querySelector('.opt-ar')?.textContent;const m=SURAHS.find(s=>s.ar===ar);if(m?.num===correct)b.classList.add('correct');});
+    const cs=SURAHS.find(s=>s.num===correct);
+    const name=currentLang==='en'?cs.en:currentLang==='ar'?cs.ar:cs.fr;
+    fb.textContent=t('wrongFbPre')+cs.ar+(currentLang!=='ar'?' ('+name+')':'');
+    fb.className='feedback wrong';
+  }
+  const limitReached=state.maxQ!==Infinity&&state.qNum>=state.maxQ;
+  if(!limitReached){const nb=document.getElementById('q-next');nb.style.display='';nb.textContent=t('nextVerse');}
+  else setTimeout(endQuiz,1400);
+}
+
+function endQuiz(){
+  document.getElementById('end-score').textContent='0';
+  document.getElementById('end-total').textContent=state.maxQ===Infinity?'':'/'+state.maxQ;
+  document.getElementById('end-subtitle').textContent=t('endSubtitle');
+  document.getElementById('replay-btn').textContent=t('replay');
+  document.getElementById('home-btn-end').textContent=t('homeBtn');
+  const ratio=state.maxQ===Infinity?1:state.score/state.maxQ;
+  let stars='',msg='';
+  if(ratio>=0.9){stars='★★★';msg=t('endMsg9');}else if(ratio>=0.6){stars='★★';msg=t('endMsg6');}
+  else if(ratio>=0.3){stars='★';msg=t('endMsg3');}else{stars='';msg=t('endMsg0');}
+  document.getElementById('end-stars').textContent=stars;
+  document.getElementById('end-msg').textContent=msg;
+  showScreen('screen-end');
+  animateScoreCount(document.getElementById('end-score'),state.score);
+  setTimeout(()=>{
+    const fill=document.getElementById('score-ring-fill');
+    if(fill&&state.maxQ!==Infinity){const circ=2*Math.PI*56;fill.style.strokeDashoffset=circ*(1-Math.min(state.score/state.maxQ,1));}
+  },300);
+  if(ratio>=0.9) setTimeout(spawnConfetti,600);
+}
+
+/* ════ MODE DEVINETTE (v8.3 — indices progressifs) ════ */
+function startModeDevinette(){
+  state.score=0;state.qNum=0;state.maxQ=selectedSeries===Infinity?Infinity:selectedSeries;
+  state.answered=false;state.usedVerseKeys=new Set();state.currentMode='devinette';
+  document.getElementById('gv-nav-menu').textContent=t('navMenu');
+  document.getElementById('gv-nav-quit').textContent=t('navQuit');
+  document.getElementById('gv-end-btn').textContent=t('endGame');
+  showScreen('screen-guess-mode');loadGuessQuestion();
+}
+
+async function loadGuessQuestion(){
+  if(state.maxQ!==Infinity&&state.qNum>=state.maxQ){endGuessMode();return;}
+  state.qNum++;state.guessAttempts=0;state.hintHistory=[];
+  document.getElementById('gv-num').textContent=state.qNum;
+  document.getElementById('gv-total').textContent=state.maxQ===Infinity?'/∞':'/'+state.maxQ;
+  document.getElementById('gv-score').textContent=state.score;
+  document.getElementById('gv-feedback-area').innerHTML='';
+  document.getElementById('gv-hints-area').innerHTML='';
+  document.getElementById('gv-submit-btn').disabled=true;
+  document.getElementById('gv-selected-name').textContent=t('gvSelectPrompt');
+  document.getElementById('gv-attempts-bar').innerHTML=_renderAttemptsDots(0);
+  state.guessSelected=null;
+  document.querySelectorAll('#gv-surah-grid .sg-btn').forEach(b=>b.classList.remove('selected'));
+  let verse=null,surahInfo=null;
+  const api=QuranAPI.getBufferedVerse();
+  if(api){const info=SURAHS.find(s=>s.num===api.n);if(info&&!state.usedVerseKeys.has(`${api.n}:${api.a}`)){verse=api;surahInfo=info;state.usedVerseKeys.add(`${api.n}:${api.a}`);}}
+  if(!verse){
+    if(state.deckPos>=(state.shuffledDeck?.length||0)){state.shuffledDeck=buildWeightedDeck();state.deckPos=0;}
+    if(!state.shuffledDeck){state.shuffledDeck=buildWeightedDeck();state.deckPos=0;}
+    const idx=state.shuffledDeck[state.deckPos++];
+    verse=VERSES[idx];surahInfo=SURAHS.find(s=>s.num===verse.n);
+    if(!surahInfo){loadGuessQuestion();return;}
+  }
+  state.guessVerse=verse;state.guessSurah=surahInfo;
+  const maskedVerse=maskSurahNameInVerse(verse.v,verse,surahInfo);
+  const verseEl=document.getElementById('gv-verse');
+  verseEl.innerHTML=maskedVerse;
+  const verseKey=`${surahInfo.num}:${verse.a}`;
+  if(!maskedVerse.includes('name-mask')&&MASK_DB.has(verseKey)){_applyAIMask('gv-verse',verse,surahInfo);}
+  const badge=document.getElementById('gv-diff-badge');
+  if(verse.d===1){badge.textContent=t('diffEasy');badge.className='diff-badge diff-easy';}
+  else if(verse.d===2){badge.textContent=t('diffMedium');badge.className='diff-badge diff-medium';}
+  else{badge.textContent=t('diffHard');badge.className='diff-badge diff-hard';}
+  document.getElementById('gv-question-label').textContent=t('guessQuestion');
+  _buildSurahGrid();
+  document.getElementById('gv-submit-btn').textContent=t('guessSubmit');
+  document.getElementById('gv-abandon-btn').textContent=t('guessAbandon');
+  document.getElementById('gv-next-btn').style.display='none';
+  document.getElementById('gv-submit-btn').style.display='';
+  document.getElementById('gv-abandon-btn').style.display='';
+}
+
+function _renderAttemptsDots(count){
+  let html=`<span style="font-family:'Fredoka One',cursive;font-size:.74rem;color:var(--text-dim);margin-right:6px">${t('attempts')} :</span>`;
+  for(let i=0;i<5;i++){
+    const filled=i<count;
+    html+=`<span style="display:inline-block;width:10px;height:10px;border-radius:50%;margin:0 2px;background:${filled?'var(--accent)':'rgba(150,150,150,0.3)'};border:1px solid var(--border)"></span>`;
+  }
+  return html;
+}
+
+function _buildSurahGrid(){
+  const grid=document.getElementById('gv-surah-grid');
+  grid.innerHTML='';
+  SURAHS.forEach(s=>{
+    const btn=document.createElement('button');btn.className='sg-btn';btn.dataset.num=s.num;
+    const sub=currentLang==='en'?s.en:currentLang==='ar'?'':s.fr;
+    btn.innerHTML=`<span class="sg-num">${s.num}</span><span class="sg-ar">${s.ar}</span>${sub?`<span class="sg-fr">${sub}</span>`:''}`;
+    btn.onclick=()=>_selectGuessSurah(s.num,btn);
+    grid.appendChild(btn);
+  });
+}
+
+function _selectGuessSurah(num,btn){
+  document.querySelectorAll('#gv-surah-grid .sg-btn').forEach(b=>b.classList.remove('selected'));
+  btn.classList.add('selected');state.guessSelected=num;
+  document.getElementById('gv-submit-btn').disabled=false;
+  const s=SURAHS.find(x=>x.num===num);
+  const sub=s?(currentLang==='en'?s.en:currentLang==='ar'?'':s.fr):'';
+  document.getElementById('gv-selected-name').innerHTML=
+    `<span style="font-family:'Amiri',serif;font-size:1.1rem;color:var(--accent)">${s?.ar||''}</span>`+
+    (sub?` <span style="font-size:.78rem;color:var(--text-dim)">(${sub})</span>`:'');
+}
+
+function submitGuess(){
+  if(!state.guessSelected) return;
+  const chosen=state.guessSelected,correct=state.guessSurah.num;
+  state.guessAttempts++;
+  document.getElementById('gv-attempts-bar').innerHTML=_renderAttemptsDots(state.guessAttempts);
+  if(chosen===correct){
+    state.score++;
+    const pts=Math.max(1,6-state.guessAttempts);
+    spawnScoreFloat(`+${pts}`,document.getElementById('gv-score'));
+    document.getElementById('gv-score').textContent=state.score;
+    const scoreEl=document.getElementById('gv-score');
+    scoreEl.classList.remove('bump');void scoreEl.offsetWidth;scoreEl.classList.add('bump');
+    // Feedback bonne réponse
+    const area=document.getElementById('gv-feedback-area');
+    area.innerHTML=`<div class="gv-fb gv-fb-correct"><div><div style="font-family:'Fredoka One',cursive;font-size:1rem;color:var(--correct-fg)">${t('guessCorrect')} +${pts} pts</div><div style="font-size:.78rem;color:var(--text-dim);margin-top:2px">${t('attempt')} ${state.guessAttempts}</div></div></div>`;
+    _lockGuessInput(true);_showGuessNext();
+  } else {
+    /* Mauvaise réponse — générer l'indice pour cet essai */
+    const hint=getHintForAttempt(state.guessAttempts,chosen,state.guessSurah);
+    if(hint) state.hintHistory.push(hint);
+    /* Afficher feedback court */
+    const gS=SURAHS.find(s=>s.num===chosen);
+    const gName=gS?(currentLang==='en'?gS.en:currentLang==='ar'?gS.ar:gS.fr):'';
+    const area=document.getElementById('gv-feedback-area');
+    area.innerHTML=`<div class="gv-fb gv-fb-wrong"><div style="font-family:'Fredoka One',cursive;font-size:.88rem;color:var(--wrong-fg)">${gName} — faux</div></div>`;
+    /* Afficher tous les indices accumulés */
+    _renderHints(state.hintHistory);
+    if(state.guessAttempts>=5){
+      _abandonGuess();
+    } else {
+      state.guessSelected=null;
+      document.getElementById('gv-submit-btn').disabled=true;
+      document.getElementById('gv-selected-name').textContent=t('gvSelectPrompt');
+      document.querySelectorAll('#gv-surah-grid .sg-btn').forEach(b=>b.classList.remove('selected'));
+    }
+  }
+}
+
+function abandonGuess(){if(!confirm(t('abandonConfirm')))return;_abandonGuess();}
+function _abandonGuess(){
+  const correct=state.guessSurah;
+  const cName=currentLang==='en'?correct.en:currentLang==='ar'?correct.ar:correct.fr;
+  const area=document.getElementById('gv-feedback-area');
+  area.innerHTML=`<div class="gv-fb gv-fb-reveal" style="margin-top:8px"><div><div style="font-size:.78rem;color:var(--text-dim);margin-bottom:4px">${t('correctAnswerWas')}</div><div style="font-family:'Amiri',serif;font-size:1.5rem;color:var(--accent);direction:rtl">${correct.ar}</div><div style="font-size:.78rem;color:var(--text-dim)">${cName} · ${t('surahLabel')} ${correct.num}</div></div></div>`;
+  _lockGuessInput(false);_showGuessNext();
+}
+
+function _lockGuessInput(success){
+  document.getElementById('gv-submit-btn').style.display='none';
+  document.getElementById('gv-abandon-btn').style.display='none';
+  document.querySelectorAll('#gv-surah-grid .sg-btn').forEach(b=>{
+    if(parseInt(b.dataset.num)===state.guessSurah.num){b.classList.add('correct-answer');b.scrollIntoView({behavior:'smooth',block:'nearest'});}
+  });
+}
+
+function _showGuessNext(){
+  const nb=document.getElementById('gv-next-btn');nb.style.display='';
+  nb.textContent=(state.maxQ!==Infinity&&state.qNum>=state.maxQ)?t('endGame'):t('nextVerse');
+  nb.onclick=()=>{if(state.maxQ!==Infinity&&state.qNum>=state.maxQ)endGuessMode();else loadGuessQuestion();};
+}
+
+function endGuessMode(){
+  document.getElementById('end-score').textContent='0';
+  document.getElementById('end-total').textContent=state.maxQ===Infinity?'':'/'+state.maxQ;
+  document.getElementById('end-subtitle').textContent=t('endSubtitle');
+  document.getElementById('replay-btn').textContent=t('replay');
+  document.getElementById('home-btn-end').textContent=t('homeBtn');
+  const ratio=state.maxQ===Infinity?1:state.score/state.maxQ;
+  let stars='',msg='';
+  if(ratio>=0.9){stars='★★★';msg=t('endMsg9');}else if(ratio>=0.6){stars='★★';msg=t('endMsg6');}
+  else if(ratio>=0.3){stars='★';msg=t('endMsg3');}else{stars='';msg=t('endMsg0');}
+  document.getElementById('end-stars').textContent=stars;
+  document.getElementById('end-msg').textContent=msg;
+  showScreen('screen-end');
+  animateScoreCount(document.getElementById('end-score'),state.score);
+  setTimeout(()=>{const fill=document.getElementById('score-ring-fill');if(fill&&state.maxQ!==Infinity){const circ=2*Math.PI*56;fill.style.strokeDashoffset=circ*(1-Math.min(state.score/state.maxQ,1));}},300);
+  if(ratio>=0.9) setTimeout(spawnConfetti,600);
+}
+
+function replayFromEnd(){if(state.currentMode==='devinette')startModeDevinette();else startMode1();}
+
+/* ════ MAINTENANCE ════ */
+function startDuelSetup(){
+  const el=document.getElementById('maint-msg-text');
+  const el2=document.getElementById('maint-btn-ok');
+  if(el)el.textContent=t('maintMsg');if(el2)el2.textContent=t('maintOk');
+  document.getElementById('maintenance-overlay').classList.add('show');
+}
+function closeMaintenanceOverlay(){document.getElementById('maintenance-overlay')?.classList.remove('show');}
+
+/* ════ ANIMATIONS & UTILITAIRES ════ */
+function spawnScoreFloat(text,nearEl){
+  const el=document.createElement('div');el.className='score-plus-anim';el.textContent=text;
+  const rect=nearEl?.getBoundingClientRect?.()??{left:window.innerWidth/2,top:window.innerHeight/2,width:0};
+  el.style.left=(rect.left+rect.width/2-20)+'px';el.style.top=(rect.top-10+window.scrollY)+'px';
+  el.style.textShadow='0 0 14px rgba(255,214,0,.8)';
+  document.body.appendChild(el);setTimeout(()=>el.remove(),1100);
+}
+function animateScoreCount(el,target){
+  let cur=0;const step=Math.ceil(target/30)||1;
+  const iv=setInterval(()=>{cur=Math.min(cur+step,target);el.textContent=cur;if(cur>=target)clearInterval(iv);},40);
+}
+function spawnConfetti(){
+  const wrap=document.getElementById('confetti-wrap');if(!wrap)return;wrap.innerHTML='';
+  const colors=['#d4a84b','#f0c870','#c49a6c','#ffffff','#ef9a9a','#7aefb4','#89cff0','#ffb347'];
+  for(let i=0;i<100;i++){
+    const p=document.createElement('div');p.className='confetti-piece';
+    const sz=6+Math.random()*10;
+    p.style.cssText=`left:${Math.random()*100}%;top:-20px;background:${colors[Math.floor(Math.random()*colors.length)]};width:${sz}px;height:${sz}px;border-radius:${Math.random()>.5?'50%':'2px'};animation-duration:${1.5+Math.random()*2.5}s;animation-delay:${Math.random()*.8}s;`;
+    wrap.appendChild(p);
+  }
+}
+function shuffle(arr){
+  const a=[...arr];
+  for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
+  return a;
+}
+</script>
+
+<script>
+/* ════ API QURAN (alquran.cloud — 114 sourates) ════ */
+const QuranAPI=(() => {
+  const BASE_URL='https://api.alquran.cloud/v1/surah/';
+  const TRANSLATION='fr.hamidullah';
+  const TOTAL_SURAHS=114;
+  const BUFFER_SIZE=8;
+  let _buffer=[];
+  let _warming=false;
+  let _onReady=null;
+
+  function _randomSurah(){return Math.floor(Math.random()*TOTAL_SURAHS)+1;}
+
+  async function _fetchRandomVerse(){
+    const surahNum=_randomSurah();
+    const arRes=await fetch(BASE_URL+surahNum);
+    if(!arRes.ok) throw new Error(`API error ${arRes.status}`);
+    const arJSON=await arRes.json();
+    const totalAyahs=arJSON.data.numberOfAyahs;
+    const ayahIndex=Math.floor(Math.random()*totalAyahs);
+    const ayahNum=ayahIndex+1;
+    const arabicText=arJSON.data.ayahs[ayahIndex].text;
+    const transURL=BASE_URL+surahNum+'/'+TRANSLATION;
+    const trRes=await fetch(transURL);
+    let transText='';
+    if(trRes.ok){const trJSON=await trRes.json();transText=trJSON.data.ayahs[ayahIndex]?.text||'';}
+    return {
+      n:surahNum,a:ayahNum,v:arabicText,t:transText,
+      d:surahNum>=78?1:(totalAyahs>100?3:2),
+    };
+  }
+
+  async function _fillBuffer(){
+    if(_warming) return;
+    _warming=true;
+    const promises=[];
+    for(let i=0;i<BUFFER_SIZE;i++){
+      promises.push(_fetchRandomVerse().catch(err=>{console.warn('[QuranAPI]',err.message);return null;}));
+    }
+    const results=await Promise.all(promises);
+    results.forEach(v=>{if(v)_buffer.push(v);});
+    _warming=false;
+    if(_onReady&&_buffer.length>0){const cb=_onReady;_onReady=null;cb(_buffer.length);}
+  }
+
+  function warmup(onReady){_onReady=onReady||null;_fillBuffer();}
+
+  function getBufferedVerse(){
+    if(_buffer.length===0) return null;
+    const verse=_buffer.shift();
+    if(_buffer.length<BUFFER_SIZE/2&&!_warming)_fillBuffer();
+    return verse;
+  }
+
+  async function fetchOne(){return await _fetchRandomVerse();}
+  function bufferSize(){return _buffer.length;}
+
+  return {warmup,getBufferedVerse,fetchOne,bufferSize};
+})();
+</script>
+
+<script>
+/* ════ INIT ════ */
+const savedTheme=localStorage.getItem('quranTheme')||'gold';
+applyTheme(savedTheme);
+const savedLang=localStorage.getItem('quranLang')||'fr';
+currentLang=savedLang;
+document.querySelectorAll('.lang-btn').forEach(b=>{
+  if(b.textContent.trim().toLowerCase().startsWith(savedLang.slice(0,2).toUpperCase().slice(0,1).toLowerCase())||
+     (savedLang==='fr'&&b.textContent.includes('FR'))||
+     (savedLang==='ar'&&b.textContent.includes('AR'))||
+     (savedLang==='en'&&b.textContent.includes('EN'))){
+    b.classList.add('active');
+  } else {b.classList.remove('active');}
+});
+applyLang();
+QuranAPI.warmup();
+</script>
+</body>
+</html>
