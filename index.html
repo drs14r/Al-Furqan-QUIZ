@@ -1,34 +1,81 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Al Furqan Quiz · v10.0</title>
-    <link href="https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2&family=Fredoka+One&display=swap" rel="stylesheet">
+    <!-- Polices cartoon (français) et Fredoka One (anglais) -->
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@700&family=Fredoka+One&display=swap" rel="stylesheet">
     <style>
-        .logo-img {
-            width: 160px;
+        body { font-family: 'Baloo Bhaijaan 2', cursive, sans-serif; background: #101010; color: #F2F2F2; }
+        .logo-img { width: 240px; display: block; margin: 32px auto 16px; }
+        .quit-btn {
+            background: #222;
+            color: #fff;
+            border: none;
+            padding: 16px 32px;
+            font-size: 1.2em;
+            border-radius: 12px;
+            margin: 12px auto;
+            display: block;
+            cursor: pointer;
+            transition: background 0.2s;
         }
-        .wrong-bg {
-            background-color: #404040;
-        }
+        .quit-btn:hover { background: #444; }
+        .proximity-bar { margin: 24px 0; font-size: 1.2em; text-align: center;}
+        /* EN: police Fredoka */
+        html[lang="en"] body { font-family: 'Fredoka One', cursive, sans-serif; }
+        /* Ne pas traduire */
+        .no-translate { user-select: all; unicode-bidi: embed; }
     </style>
 </head>
 <body>
-    <h1>Welcome to Al Furqan Quiz</h1>
-    <button class="quit-btn wrong-bg">Quit</button>
+    <img src="logo.png" alt="Al Furqan" class="logo-img">
+    <h1>Bienvenue sur <span class="no-translate">Al Furqan Quiz</span> <small>v10.0</small></h1>
+
+    <!-- Exemple de question/non-traduits -->
+    <div>
+        <b class="no-translate">سورة وَٱلۡعَٰدِيَٰتِ</b>
+        <div class="no-translate">قَالَ ٱللَّهُ تَعَالَى : وَٱلۡعَٰدِيَٰتِ ضَبْحًا</div>
+    </div>
+
+    <div class="proximity-bar" id="proximity"></div>
+    <button class="quit-btn">Quitter</button>
+
     <script>
-        // Name Mask Implementation
-        function nameMask(input) {
-            input = input.replace(/[\u0600-\u06FF]/g, ''); // ignore harakats
-            return input;
-        }
-        // Restore proximity percentage display
-        function updateProximityDisplay(percentage) {
-            if (percentage < 30) return 'loin';
-            else if (percentage < 70) return 'presque';
-            else return 'très proche';
-        }
+    // --- Mask AR : normalisation mushaf ----
+    function normalizeArabic(str) {
+        if (!str) return '';
+        return str
+            .replace(/[\u064B-\u065F\u0670\u06D6-\u06ED]/g, '') // harakats
+            .replace(/ٱ/g, 'ا')       // alif wasla
+            .replace(/[إأٶآ]/g, 'ا') // variantes alif
+            .replace(/ى/g, 'ي')      // alef maqsura
+            .replace(/ؤ/g, 'و')
+            .replace(/ئ/g, 'ي')
+            .replace(/ة/g, 'ه')
+            .replace(/[^ء-ي ]/g, '') // keep only Arabic letters & spaces
+            .replace(/\s+/g, ' ')
+            .trim();
+    }
+
+    // Exemple d’usage
+    function isSame(mask, user) {
+        return normalizeArabic(mask) === normalizeArabic(user);
+    }
+
+    // --- Proximité : loin/presque/très proche ---
+    function updateProximityDisplay(percentage) {
+        if (percentage < 30) return 'loin';
+        else if (percentage < 70) return 'presque';
+        else return 'très proche';
+    }
+
+    // Afficher la proximité simulée (exemple)
+    let percent = 72; // simulé
+    document.getElementById('proximity').textContent = "Proximité : " + updateProximityDisplay(percent);
+
+    // Masquer indices + abandon (ne pas afficher ces éléments dans ta logique JS)
     </script>
 </body>
-</html>
+            </html>
