@@ -1,6 +1,6 @@
 # Al-Furqan-QUIZ
 Interactive Quran App
-Al Furqan Quiz · v8.3
+Al Furqan Quiz · V10.0
 
 Un jeu interactif pour tester et améliorer la connaissance du Coran à travers des versets authentiques.
 
@@ -206,7 +206,7 @@ AIC Ibn Abi Issame
 
 Version
 
-v8.3
+v10.0
 
 
 ---
